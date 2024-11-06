@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
@@ -56,5 +58,18 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // google fonts
     implementation(libs.androidx.ui.text.google.fonts)
+
+    // hilt
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.core)
+
+    // hilt navigation compose
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // navigation compose
+    implementation(libs.androidx.navigation.compose)
 }
