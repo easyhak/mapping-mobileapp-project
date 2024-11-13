@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.trip.myapp.ui.archive.archiveScreen
 import com.trip.myapp.ui.community.communityScreen
 import com.trip.myapp.ui.login.LoginRoute
@@ -34,7 +35,13 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             loginScreen(
-                onLoginSuccess = navController::navigateToCommunityScreen
+                onLoginSuccess = {
+                    navController.navigateToCommunityScreen(
+                        navOptions = navOptions {
+                            popUpTo(LoginRoute.ROUTE) { inclusive = true }
+                        }
+                    )
+                }
             )
             communityScreen()
             mapScreen()
