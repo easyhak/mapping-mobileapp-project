@@ -14,9 +14,9 @@ fun BottomNavigationBar(navController: NavController) {
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
     val items = listOf(
-        BottomNavScreen.Archive,
         BottomNavScreen.Community,
-        BottomNavScreen.Map
+        BottomNavScreen.Map,
+        BottomNavScreen.Archive,
     )
 
     BottomAppBar (
