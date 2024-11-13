@@ -63,6 +63,10 @@ dependencies {
     // google fonts
     implementation(libs.androidx.ui.text.google.fonts)
 
+    // material icon
+    api(libs.androidx.material.icons)
+    api(libs.androidx.material.icons.android)
+
     // hilt
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
@@ -76,4 +80,6 @@ dependencies {
 
     // serialization
     implementation(libs.kotlinx.serialization.json.jvm)
+
+
 }
