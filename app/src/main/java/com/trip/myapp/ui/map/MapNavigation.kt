@@ -4,14 +4,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object MapRoute {
-    const val ROUTE = "map"
-    const val NAME = "지도"
+sealed class MapRoute(val route: String, val title: String) {
+    data object MapHomeRoute : MapRoute("map_home", "맵")
+    data object MapDetailRoute : MapRoute("map_detail", "상세보기")
 }
 
 fun NavGraphBuilder.mapScreen() {
-    composable(route = MapRoute.ROUTE) {
+    composable(route = MapRoute.MapHomeRoute.route) {
         MapScreen()
     }
 }

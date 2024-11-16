@@ -3,7 +3,6 @@ package com.trip.myapp.ui.archive
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -26,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.trip.myapp.R
 
 @Composable
-fun ArchiveScreen() {
+fun ArchiveScreen(onNavigateToDetail: (String) -> Unit) {
 
     // todo data class로 변경
     val sampleCategoryItems = listOf(
@@ -87,5 +86,7 @@ fun CardItem(title: String, imageRes: Int, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewArchiveScreen() {
-    ArchiveScreen()
+    ArchiveScreen(
+        onNavigateToDetail = {}
+    )
 }

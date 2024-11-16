@@ -10,7 +10,7 @@ import com.trip.myapp.ui.community.CommunityRoute
 import com.trip.myapp.ui.map.MapRoute
 
 sealed class BottomNavScreen(val route: String, val title: String, val icon: ImageVector) {
-    data object Community : BottomNavScreen(CommunityRoute.ROUTE, CommunityRoute.NAME, Icons.Filled.People)
-    data object Map : BottomNavScreen(MapRoute.ROUTE, MapRoute.NAME, Icons.Filled.Map)
-    data object Archive : BottomNavScreen(ArchiveRoute.ROUTE, ArchiveRoute.NAME, Icons.Filled.Archive)
+    data object Community : BottomNavScreen("community_graph", "커뮤니티", Icons.Default.People)
+    data object Map : BottomNavScreen("map_graph", "지도", Icons.Default.Map)
+    data object Archive : BottomNavScreen("archive_graph", "아카이브", Icons.Default.Archive) // route를 "archive_graph"로 변경
 }
