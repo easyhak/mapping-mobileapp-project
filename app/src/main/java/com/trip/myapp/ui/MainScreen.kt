@@ -3,6 +3,7 @@ package com.trip.myapp.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CreateNewFolder
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -57,22 +58,41 @@ fun MainScreen() {
             }
         },
         floatingActionButton = {
-            if (currentRoute == BottomNavScreen.Archive.route) {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigateToCommunityScreen()
-                    }
-                ) {
-                    IconButton(
-                        onClick = { /*TODO*/ }
+            when(currentRoute){
+                BottomNavScreen.Community.route -> {
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigateToCommunityScreen()
+                        }
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.CreateNewFolder,
-                            contentDescription = "글쓰기"
-                        )
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = "글쓰기"
+                            )
+                        }
+                    }
+                }
+                BottomNavScreen.Archive.route -> {
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigate(BottomNavScreen.Community.route)
+                        }
+                    ) {
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.CreateNewFolder,
+                                contentDescription = "폴더 추가"
+                            )
+                        }
                     }
                 }
             }
+
         }
     ) { innerPadding ->
         NavHost(
