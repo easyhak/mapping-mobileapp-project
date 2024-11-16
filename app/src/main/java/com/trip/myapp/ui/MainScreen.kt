@@ -1,8 +1,17 @@
 package com.trip.myapp.ui
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CreateNewFolder
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -15,17 +24,54 @@ import com.trip.myapp.ui.login.loginScreen
 import com.trip.myapp.ui.login.navigateToCommunityScreen
 import com.trip.myapp.ui.map.mapScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
 
-    val currentBackStackEntry = navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry.value?.destination?.route
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    val bottomNavScreens = listOf(
+        BottomNavScreen.Community,
+        BottomNavScreen.Map,
+        BottomNavScreen.Archive
+    )
+
+    val bottomNavRoutes = bottomNavScreens.map { it.route }
 
     Scaffold(
+        topBar = {
+            if (currentRoute in bottomNavRoutes) {
+                val currentScreen = bottomNavScreens.find { it.route == currentRoute }
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(text = currentScreen?.title ?: "")
+                    }
+                )
+            }
+        },
         bottomBar = {
-            if (currentRoute != LoginRoute.ROUTE) {
+            if (currentRoute in bottomNavRoutes) {
                 BottomNavigationBar(navController = navController)
+            }
+        },
+        floatingActionButton = {
+            if (currentRoute == BottomNavScreen.Archive.route) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigateToCommunityScreen()
+                    }
+                ) {
+                    IconButton(
+                        onClick = { /*TODO*/ }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.CreateNewFolder,
+                            contentDescription = "글쓰기"
+                        )
+                    }
+                }
             }
         }
     ) { innerPadding ->

@@ -10,10 +10,6 @@ data object CommunityRoute {
     const val NAME = "커뮤니티"
 }
 
-//fun NavController.navigateToCommunityScreen(navOptions: NavOptions? = null) {
-//    this.navigate(CommunityScreenRoute, navOptions)
-//}
-
 fun NavGraphBuilder.communityScreen() {
     composable(route = CommunityRoute.ROUTE) {
         CommunityScreen()
