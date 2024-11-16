@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 fun MapScreen() {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    val tabs = listOf("Map", "Category")
+    val tabs = listOf("Map", "Calendar")
 
     Column {
         TabRow (
