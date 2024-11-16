@@ -25,10 +25,14 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.trip.myapp.ui.archive.ArchiveScreen
+import com.trip.myapp.ui.archive.archiveNavGraph
+import com.trip.myapp.ui.community.CommunityDetailScreen
 import com.trip.myapp.ui.community.CommunityScreen
+import com.trip.myapp.ui.community.communityNavGraph
 import com.trip.myapp.ui.login.LoginRoute
 import com.trip.myapp.ui.login.loginScreen
 import com.trip.myapp.ui.map.MapScreen
+import com.trip.myapp.ui.map.mapNavGraph
 
 @Composable
 fun MainScreen() {
@@ -48,7 +52,7 @@ fun MainScreen() {
             TopBar(
                 currentDestination = currentDestination,
                 bottomNavScreens = bottomNavScreens,
-                navController = navController
+                navController = navController,
             )
         },
         bottomBar = {
@@ -82,35 +86,9 @@ fun MainScreen() {
                 startDestination = BottomNavScreen.Community.route,
                 route = "home"
             ) {
-                // 커뮤니티 그래프
-                navigation(
-                    startDestination = "community_main",
-                    route = BottomNavScreen.Community.route
-                ) {
-                    composable("community_main") { CommunityScreen({}) }
-                    // composable("friend_list") { FriendListScreen() }
-                    // composable("add_friend") { AddFriendScreen() }
-                    // composable("post_detail") { PostDetailScreen() }
-                }
-
-                // 맵 그래프
-                navigation(
-                    startDestination = "map_main",
-                    route = BottomNavScreen.Map.route
-                ) {
-                    composable("map_main") { MapScreen({}) }
-                    // composable("map_detail") { MapDetailScreen() }
-                }
-
-                // 아카이브 그래프
-                navigation(
-                    startDestination = "archive_main",
-                    route = BottomNavScreen.Archive.route
-                ) {
-                    composable("archive_main") { ArchiveScreen({}) }
-                    // composable("archive_detail") { ArchiveDetailScreen() }
-                    // composable("add_archive") { AddArchiveScreen() }
-                }
+                communityNavGraph(navController = navController)
+                mapNavGraph(navController = navController)
+                archiveNavGraph(navController = navController)
             }
         }
     }
@@ -126,7 +104,7 @@ fun TopBar(
     val canNavigateBack = navController.previousBackStackEntry != null
 
     val currentScreen = bottomNavScreens.find { screen ->
-        currentDestination?.hierarchy?.any { it.route == screen.route } == true
+        currentDestination?.route == screen.homeRoute
     }
 
     if (currentScreen != null || canNavigateBack) {
@@ -136,18 +114,17 @@ fun TopBar(
             },
             navigationIcon = {
                 if (canNavigateBack) {
-
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
-
                 }
             }
         )
     }
+
 }
 
 @Composable
@@ -158,7 +135,9 @@ fun FloatingActionButtonForRoute(
     when {
         currentDestination?.hierarchy?.any { it.route == BottomNavScreen.Community.route } == true -> {
             FloatingActionButton(
-                onClick = {}
+                onClick = {
+                    navController.navigate("community_detail")
+                }
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Edit,

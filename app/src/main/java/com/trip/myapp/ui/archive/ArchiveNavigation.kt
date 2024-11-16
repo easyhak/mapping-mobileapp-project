@@ -16,25 +16,15 @@ sealed class ArchiveRoute(val route: String, val title: String) {
 }
 
 
-fun NavGraphBuilder.archiveScreen(navController: NavHostController) {
+fun NavGraphBuilder.archiveNavGraph(navController: NavController) {
     navigation(
-        startDestination = ArchiveRoute.ArchiveHomeRoute.route,
-        route = "archive_graph" // todo: 변수로 정의해야함
+        startDestination = "archive_main",
+        route = BottomNavScreen.Archive.route
     ) {
-        composable(route = ArchiveRoute.ArchiveHomeRoute.route) {
-            ArchiveScreen(
-                onNavigateToDetail = {
-                    // navController.navigate("${ArchiveRoute.ArchiveDetailRoute.route}/$it")
-                }
-            )
-        }
-
-        composable(
-            route = "${ArchiveRoute.ArchiveDetailRoute.route}/{archiveId}",
-            arguments = listOf(navArgument("archiveId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val archiveId = backStackEntry.arguments?.getString("archiveId") ?: return@composable
-            ArchiveDetailScreen(archiveId = archiveId)
+        composable("archive_main") {
+            ArchiveScreen(onDetailClick = {
+                // 상세 화면으로 이동 로직 추가
+            })
         }
     }
 }

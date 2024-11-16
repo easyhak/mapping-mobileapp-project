@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.trip.myapp.R
 
 @Composable
-fun ArchiveScreen(onNavigateToDetail: (String) -> Unit) {
+fun ArchiveScreen(onDetailClick: (String) -> Unit) {
 
     // todo data class로 변경
     val sampleCategoryItems = listOf(
@@ -87,6 +87,6 @@ fun CardItem(title: String, imageRes: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewArchiveScreen() {
     ArchiveScreen(
-        onNavigateToDetail = {}
+        onDetailClick = {}
     )
 }

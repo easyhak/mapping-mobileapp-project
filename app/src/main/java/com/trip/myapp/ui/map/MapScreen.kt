@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun MapScreen(onClickDetail: () -> Unit) {
+fun MapScreen(onDetailClick: () -> Unit) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val tabs = listOf("Map", "Calendar")
