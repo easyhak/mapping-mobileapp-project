@@ -1,5 +1,6 @@
 package com.trip.myapp.ui
 
+import android.util.Log
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,9 +28,9 @@ fun BottomNavigationBar(navController: NavController) {
 
             IconButton(
                 onClick = {
+                    Log.d("navigation", screen.route)
                     navController.navigate(screen.route) {
-                        // 백스택이 쌓이지 않도록 내비게이션 옵션 설정
-                        popUpTo(navController.graph.findStartDestination().id) {
+                        popUpTo("home") {
                             saveState = true
                         }
                         launchSingleTop = true

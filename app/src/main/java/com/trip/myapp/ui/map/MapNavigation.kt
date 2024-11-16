@@ -11,6 +11,6 @@ sealed class MapRoute(val route: String, val title: String) {
 
 fun NavGraphBuilder.mapScreen() {
     composable(route = MapRoute.MapHomeRoute.route) {
-        MapScreen()
+        MapScreen({})
     }
 }
