@@ -15,27 +15,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.trip.myapp.ui.archive.ArchiveScreen
 import com.trip.myapp.ui.archive.archiveNavGraph
-import com.trip.myapp.ui.community.CommunityDetailScreen
-import com.trip.myapp.ui.community.CommunityScreen
 import com.trip.myapp.ui.community.communityNavGraph
+import com.trip.myapp.ui.login.AuthViewModel
 import com.trip.myapp.ui.login.LoginRoute
 import com.trip.myapp.ui.login.loginScreen
-import com.trip.myapp.ui.map.MapScreen
 import com.trip.myapp.ui.map.mapNavGraph
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    onGoogleSignInClick: () -> Unit,
+) {
     val navController = rememberNavController()
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -71,14 +70,8 @@ fun MainScreen() {
         ) {
             // 로그인 화면
             loginScreen(
-                onLoginSuccess = {
-                    navController.navigate(
-                        route = "home",
-                        navOptions = navOptions {
-                            popUpTo(LoginRoute.ROUTE) { inclusive = true }
-                        }
-                    )
-                }
+                onGoogleSignInClick = onGoogleSignInClick,
+                navController = navController
             )
 
             // 홈 화면

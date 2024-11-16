@@ -47,6 +47,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 kotlinx-serialization-json-jvm = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "kotlinxSerializationJsonJvm" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

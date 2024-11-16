@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
@@ -9,6 +11,17 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            val keystoreProperties = Properties().apply {
+                val file = rootProject.file("local.properties")
+                if (file.exists()) {
+                    load(file.inputStream())
+                }
+            }
+            storeFile = file(keystoreProperties["KEYSTORE_PATH"] as String)
+        }
+    }
     namespace = "com.trip.myapp"
     compileSdk = 35
 
@@ -85,4 +98,5 @@ dependencies {
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.ui.auth)
+    implementation(libs.play.services.auth)
 }
