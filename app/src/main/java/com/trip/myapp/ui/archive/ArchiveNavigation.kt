@@ -2,8 +2,12 @@ package com.trip.myapp.ui.archive
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import androidx.navigation.navigation
+import com.trip.myapp.ui.community.CommunityGraph
+import com.trip.myapp.ui.map.MapGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,11 +20,23 @@ data object ArchiveGraph {
 }
 
 fun NavGraphBuilder.archiveGraph(navController: NavController) {
-    navigation<ArchiveGraph.ArchiveHomeRoute>(
+    navigation<ArchiveGraph>(
         startDestination = ArchiveGraph.ArchiveHomeRoute
     ) {
+
         composable<ArchiveGraph.ArchiveHomeRoute> {
-            ArchiveScreen({})
+            val options = NavOptions.Builder()
+                .setPopUpTo(ArchiveGraph, inclusive = false, saveState = true)
+                .setLaunchSingleTop(true)
+                .build()
+            ArchiveScreen(
+                onCommunityClick = {
+                    navController.navigate(CommunityGraph, options)
+                },
+                onMapClick = {
+                    navController.navigate(MapGraph, options)
+                },
+                onDetailClick = {})
         }
     }
 }
