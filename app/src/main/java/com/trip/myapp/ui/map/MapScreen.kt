@@ -26,7 +26,7 @@ import com.trip.myapp.ui.NavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(onDetailClick: () -> Unit) {
+fun MapScreen(onCommunityClick: ()-> Unit, onArchiveClick: ()-> Unit, onDetailClick: () -> Unit) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val navigationItems = listOf(
@@ -34,7 +34,7 @@ fun MapScreen(onDetailClick: () -> Unit) {
             icon = HomeBottomNavItem.MyDream.icon,
             labelRes = HomeBottomNavItem.MyDream.label,
             isSelected = false,
-            onClick = {},
+            onClick = onCommunityClick,
         ),
         NavigationItem(
             icon = HomeBottomNavItem.Community.icon,
@@ -46,7 +46,7 @@ fun MapScreen(onDetailClick: () -> Unit) {
             icon = HomeBottomNavItem.Setting.icon,
             labelRes = HomeBottomNavItem.Setting.label,
             isSelected = false,
-            onClick = {},
+            onClick = onArchiveClick,
         ),
     )
 
@@ -113,5 +113,5 @@ fun CalendarContent() {
 @Preview
 @Composable
 private fun PreviewMapScreen() {
-    MapScreen ({  })
+    MapScreen ({}, {}, {  })
 }

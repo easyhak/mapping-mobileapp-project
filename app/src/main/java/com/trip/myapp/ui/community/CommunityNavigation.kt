@@ -16,14 +16,12 @@ data object CommunityGraph {
 }
 
 
-fun NavGraphBuilder.communityNavGraph(navController: NavController) {
+fun NavGraphBuilder.communityGraph(navController: NavController) {
     navigation<CommunityGraph>(
         startDestination = CommunityGraph.CommunityHomeRoute,
     ) {
         composable<CommunityGraph.CommunityHomeRoute> {
-            CommunityScreen(onDetailClick = {
-                navController.navigate(CommunityGraph.CommunityDetailRoute(1))
-            })
+            CommunityScreen({}, {})
         }
         composable<CommunityGraph.CommunityDetailRoute> {
             CommunityDetailScreen( navController::navigateUp)

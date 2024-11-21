@@ -12,10 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +32,9 @@ import com.trip.myapp.ui.NavigationItem
 
 // viewmodel 받을 수 있는 것 따로
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchiveScreen(onDetailClick: (String) -> Unit) {
+fun ArchiveScreen(onCommunityClick: ()-> Unit, onMapClick: ()-> Unit, onDetailClick: (String) -> Unit) {
 
     // todo data class로 변경
     val sampleCategoryItems = listOf(
@@ -46,18 +48,18 @@ fun ArchiveScreen(onDetailClick: (String) -> Unit) {
             icon = HomeBottomNavItem.MyDream.icon,
             labelRes = HomeBottomNavItem.MyDream.label,
             isSelected = false,
-            onClick = {},
+            onClick = onCommunityClick,
         ),
         NavigationItem(
             icon = HomeBottomNavItem.Community.icon,
             labelRes = HomeBottomNavItem.Community.label,
-            isSelected = true,
-            onClick = {},
+            isSelected = false,
+            onClick = onMapClick,
         ),
         NavigationItem(
             icon = HomeBottomNavItem.Setting.icon,
             labelRes = HomeBottomNavItem.Setting.label,
-            isSelected = false,
+            isSelected = true,
             onClick = {},
         ),
     )
@@ -66,6 +68,11 @@ fun ArchiveScreen(onDetailClick: (String) -> Unit) {
     Scaffold (
         bottomBar = {
             HomeBottomNavigation(items = navigationItems)
+        },
+        topBar = {
+            TopAppBar(
+                { Text("Mapping") },
+            )
         }
     ){ innerPadding ->
         LazyVerticalGrid(
@@ -122,6 +129,8 @@ fun CardItem(title: String, imageRes: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewArchiveScreen() {
     ArchiveScreen(
+        {},
+        {},
         onDetailClick = {}
     )
 }
