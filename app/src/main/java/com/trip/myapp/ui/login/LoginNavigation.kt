@@ -6,16 +6,10 @@ import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object LoginRoute {
-    const val ROUTE = "login"
-    const val NAME = "로그인"
-}
+data object LoginRoute
 
-fun NavGraphBuilder.loginScreen(onGoogleSignInClick: () -> Unit, navController: NavController) {
-    composable(route = LoginRoute.ROUTE) {
-        LoginScreen(
-            onClickLoginButton = onGoogleSignInClick,
-            navController = navController
-        )
+fun NavGraphBuilder.loginScreen(navController: NavController) {
+    composable<LoginRoute> {
+        LoginScreen({})
     }
 }

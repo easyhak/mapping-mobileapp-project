@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +25,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.trip.myapp.R
+import com.trip.myapp.ui.HomeBottomNavItem
+import com.trip.myapp.ui.HomeBottomNavigation
+import com.trip.myapp.ui.NavigationItem
+
+// viewmodel 받을 수 있는 것 따로
 
 @Composable
 fun ArchiveScreen(onDetailClick: (String) -> Unit) {
@@ -34,22 +41,50 @@ fun ArchiveScreen(onDetailClick: (String) -> Unit) {
         Pair("여행3", R.drawable.category_sample_3),
     )
 
+    val navigationItems = listOf(
+        NavigationItem(
+            icon = HomeBottomNavItem.MyDream.icon,
+            labelRes = HomeBottomNavItem.MyDream.label,
+            isSelected = false,
+            onClick = {},
+        ),
+        NavigationItem(
+            icon = HomeBottomNavItem.Community.icon,
+            labelRes = HomeBottomNavItem.Community.label,
+            isSelected = true,
+            onClick = {},
+        ),
+        NavigationItem(
+            icon = HomeBottomNavItem.Setting.icon,
+            labelRes = HomeBottomNavItem.Setting.label,
+            isSelected = false,
+            onClick = {},
+        ),
+    )
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize().padding(8.dp),
-        contentPadding = PaddingValues(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp), // 아이템 간의 가로 간격
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(sampleCategoryItems.size) { index ->
-            CardItem(
-                title = sampleCategoryItems[index].first,
-                imageRes = sampleCategoryItems[index].second,
-                modifier = Modifier
-            )
+
+    Scaffold (
+        bottomBar = {
+            HomeBottomNavigation(items = navigationItems)
+        }
+    ){ innerPadding ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.padding(innerPadding).fillMaxSize().padding(8.dp),
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp), // 아이템 간의 가로 간격
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(sampleCategoryItems.size) { index ->
+                CardItem(
+                    title = sampleCategoryItems[index].first,
+                    imageRes = sampleCategoryItems[index].second,
+                    modifier = Modifier
+                )
+            }
         }
     }
+
 }
 
 @Composable

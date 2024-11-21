@@ -4,22 +4,24 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.trip.myapp.ui.BottomNavScreen
 import kotlinx.serialization.Serializable
 
-sealed class MapRoute(val route: String, val title: String) {
-    data object MapHomeRoute : MapRoute("map_home", "맵")
-    data object MapDetailRoute : MapRoute("map_detail", "상세보기")
-}
+@Serializable
+data object MapGraph {
+    @Serializable
+    data object MapHomeRoute
 
-fun NavGraphBuilder.mapNavGraph(navController: NavController) {
-    navigation(
-        startDestination = "map_main",
-        route = BottomNavScreen.Map.route
+    @Serializable
+    data class MapDetailRoute(val id: Long)
+}
+fun NavGraphBuilder.mapGraph(navController: NavController) {
+    navigation<MapGraph>(
+        startDestination = MapGraph.MapHomeRoute,
     ) {
-        composable("map_main") {
+        composable<MapGraph.MapHomeRoute> {
             MapScreen(onDetailClick = {
             })
         }
+
     }
 }

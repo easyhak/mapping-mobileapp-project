@@ -25,7 +25,6 @@ import androidx.navigation.NavController
 @Composable
 fun LoginScreen(
     onClickLoginButton: () -> Unit,
-    navController: NavController,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
 

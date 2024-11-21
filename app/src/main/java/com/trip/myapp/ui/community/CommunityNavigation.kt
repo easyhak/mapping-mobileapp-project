@@ -2,31 +2,31 @@ package com.trip.myapp.ui.community
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.trip.myapp.ui.BottomNavScreen
+import kotlinx.serialization.Serializable
 
+@Serializable
+data object CommunityGraph {
+    @Serializable
+    data object CommunityHomeRoute
 
-sealed class CommunityRoute(val route: String, val title: String) {
-    data object CommunityHomeRoute : CommunityRoute("community_home", "커뮤니티")
-    data object CommunityDetailRoute : CommunityRoute("community_detail", "상세보기")
+    @Serializable
+    data class CommunityDetailRoute(val id: Long)
 }
 
+
 fun NavGraphBuilder.communityNavGraph(navController: NavController) {
-    navigation(
-        startDestination = "community_main",
-        route = BottomNavScreen.Community.route
+    navigation<CommunityGraph>(
+        startDestination = CommunityGraph.CommunityHomeRoute,
     ) {
-        composable("community_main") {
+        composable<CommunityGraph.CommunityHomeRoute> {
             CommunityScreen(onDetailClick = {
-                navController.navigate("community_detail")
+                navController.navigate(CommunityGraph.CommunityDetailRoute(1))
             })
         }
-        composable("community_detail") {
-            CommunityDetailScreen("")
+        composable<CommunityGraph.CommunityDetailRoute> {
+            CommunityDetailScreen( navController::navigateUp)
         }
     }
 }

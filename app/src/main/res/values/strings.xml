@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MobileAppProject</string>
     <string name="default_web_client_id">290243636521-0qdpuet4ldm3n73rmotm4sslebnrmnc4.apps.googleusercontent.com</string>
+    <string name="icon_text_community">친구</string>
+    <string name="icon_text_map">지도</string>
+    <string name="icon_text_archive">아카이브</string>
 </resources>
