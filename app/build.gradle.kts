@@ -25,7 +25,6 @@ android {
             } else {
                 file("${System.getProperty("user.home")}/.android/debug.keystore")
             }
-            storeFile = file(keystoreProperties["KEYSTORE_PATH"] as String)
         }
     }
     namespace = "com.trip.myapp"
