@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.trip.myapp.R
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
@@ -34,15 +34,10 @@ data class Folder(
 fun ArchiveScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
-    onDetailClick: (String) -> Unit
+    onDetailClick: (String) -> Unit,
+    viewModel: ArchiveViewModel = viewModel()
 ) {
-    var folders by remember {
-        mutableStateOf(
-            listOf(
-                Folder(name = "전체", imageRes = R.drawable.category_sample_2, isDefault = true)
-            )
-        )
-    }
+    val folders by viewModel.folders.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
     val navigationItems = listOf(
@@ -105,13 +100,11 @@ fun ArchiveScreen(
         }
     }
 
-    // 폴더 추가를 위한 다이얼로그
     if (showDialog) {
         AddFolderDialog(
             onDismiss = { showDialog = false },
             onAddFolder = { folderName ->
-                folders =
-                    folders + Folder(name = folderName, imageRes = R.drawable.category_sample_1)
+                viewModel.addFolder(folderName) // ViewModel을 통해 폴더 추가
                 showDialog = false
             }
         )
