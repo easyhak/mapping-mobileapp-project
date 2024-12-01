@@ -106,4 +106,7 @@ dependencies {
     implementation(libs.firebase.ui.auth)
     implementation(libs.play.services.auth)
     implementation(libs.firebase.firestore)
+
+    // paging
+    implementation(libs.androidx.paging.runtime)
 }
