@@ -45,6 +45,7 @@ fun MapScreen(
 
     val title = viewModel.title.collectAsStateWithLifecycle()
     val content = viewModel.content.collectAsStateWithLifecycle()
+    val selectedImages = viewModel.selectedImages.collectAsStateWithLifecycle()
 
     MapScreen(
         onCommunityClick = onCommunityClick,
@@ -53,6 +54,8 @@ fun MapScreen(
         content = content.value,
         onTitleChange = viewModel::updateTitle,
         onContentChange = viewModel::updateContent,
+        selectedImages = selectedImages.value,
+        onImagesChange = viewModel::addSelectedImages
     )
 }
 
@@ -65,6 +68,8 @@ private fun MapScreen(
     content: String,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
+    selectedImages: List<String>,
+    onImagesChange: (List<String>) -> Unit,
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -144,7 +149,9 @@ private fun MapScreen(
                         title = title,
                         content = content,
                         onTitleChange = onTitleChange,
-                        onContentChange = onContentChange
+                        onContentChange = onContentChange,
+                        selectedImages = selectedImages,
+                        onImagesChange = onImagesChange,
                     )
                 }
             }

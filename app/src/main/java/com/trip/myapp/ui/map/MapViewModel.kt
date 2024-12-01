@@ -18,11 +18,20 @@ class MapViewModel @Inject constructor(
     private val _content = MutableStateFlow("")
     val content = _content.asStateFlow()
 
+    // 선택된 이미지 URI 목록
+    private val _selectedImages = MutableStateFlow<List<String>>(emptyList())
+    val selectedImages = _selectedImages.asStateFlow()
+
     fun updateTitle(newTitle: String) {
         _title.value = newTitle
     }
 
     fun updateContent(content: String) {
         _content.value = content
+    }
+
+
+    fun addSelectedImages(images: List<String>) {
+        _selectedImages.value = images
     }
 }
