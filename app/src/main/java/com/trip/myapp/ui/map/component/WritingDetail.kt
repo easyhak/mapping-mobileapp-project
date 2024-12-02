@@ -1,5 +1,9 @@
 package com.trip.myapp.ui.map.component
 
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.trip.myapp.ui.theme.AppTheme
@@ -30,7 +35,9 @@ fun BottomSheetAddContent(
     title: String,
     content: String,
     onTitleChange: (String) -> Unit,
-    onContentChange: (String) -> Unit
+    onContentChange: (String) -> Unit,
+    selectedImages: List<String>,
+    onImagesChange: (List<String>) -> Unit
 ) {
 
     Column(
@@ -54,7 +61,10 @@ fun BottomSheetAddContent(
             onContentChange = onContentChange
         )
         //사진
-        PickingPhoto()
+        PickingPhoto(
+            selectedImages = selectedImages,
+            onImagesChange = onImagesChange
+        )
 
         //날짜
         PickingDate()
@@ -65,7 +75,7 @@ fun BottomSheetAddContent(
 }
 
 @Composable
-fun ShowingTitle() {
+private fun ShowingTitle() {
     Text(
         text = "여행 기록하기",
         style = MaterialTheme.typography.headlineLarge,
@@ -75,7 +85,7 @@ fun ShowingTitle() {
 
 @Composable
 
-fun WritingTitle(
+private fun WritingTitle(
     title: String,
     onTitleChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -101,7 +111,7 @@ fun WritingTitle(
 }
 
 @Composable
-fun WritingExplanation(
+private fun WritingExplanation(
     content: String,
     onContentChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -128,25 +138,67 @@ fun WritingExplanation(
 }
 
 @Composable
-fun PickingPhoto() {
+private fun PickingPhoto(
+    selectedImages: List<String>,
+    onImagesChange: (List<String>) -> Unit
+) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments(),
+        onResult = { uris ->
+            val names = uris.mapNotNull { uri ->
+                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    cursor.moveToFirst()
+                    if (nameIndex != -1) cursor.getString(nameIndex) else null
+                }
+            }
+            // 선택된 이미지 목록 업데이트
+            onImagesChange(names)
+        }
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 아이콘 클릭 시 PhotoPicker 실행
         Icon(
             imageVector = Icons.Outlined.Image,
             contentDescription = "image",
             modifier = Modifier
                 .padding(start = 16.dp)
                 .size(48.dp)
+                .clickable {
+                    launcher.launch(arrayOf("image/*"))
+                }
         )
+
+        // 선택한 이미지 이름 표시
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            if (selectedImages.isNotEmpty()) {
+                selectedImages.forEach { imageName ->
+                    Text(
+                        text = imageName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            } else {
+                Text(
+                    text = "이미지를 선택하세요",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun PickingDate() {
+private fun PickingDate() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -193,6 +245,9 @@ private fun PreviewBottomSheet() {
             content = "우와",
             onTitleChange = {},
             onContentChange = {},
+            selectedImages = emptyList(),
+            onImagesChange = {},
+
         )
     }
 }
