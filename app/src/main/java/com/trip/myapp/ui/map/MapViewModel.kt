@@ -1,6 +1,7 @@
 package com.trip.myapp.ui.map
 
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,8 @@ class MapViewModel @Inject constructor(
     private val _endDate = MutableStateFlow("")
     val endDate = _endDate.asStateFlow()
 
+    private val _pinColor = MutableStateFlow(Color(0xFF000000))
+    val pinColor = _pinColor.asStateFlow()
 
 
     fun updateTitle(newTitle: String) {
@@ -48,5 +51,9 @@ class MapViewModel @Inject constructor(
 
     fun updateEndDate(endDate: String?) {
         _endDate.value = endDate ?: ""
+    }
+
+    fun updatePinColor(pinColor: Color?) {
+        _pinColor.value = pinColor ?: Color(0xFF000000)
     }
 }

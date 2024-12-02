@@ -28,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +49,7 @@ fun MapScreen(
     val selectedImages = viewModel.selectedImages.collectAsStateWithLifecycle()
     val startDate = viewModel.startDate.collectAsStateWithLifecycle()
     val endDate = viewModel.endDate.collectAsStateWithLifecycle()
+    val pinColor = viewModel.pinColor.collectAsStateWithLifecycle()
 
     MapScreen(
         onCommunityClick = onCommunityClick,
@@ -61,7 +63,9 @@ fun MapScreen(
         startDate = startDate.value,
         endDate = endDate.value,
         onStartDateChange = viewModel::updateStartDate,
-        onEndDateChange = viewModel::updateEndDate
+        onEndDateChange = viewModel::updateEndDate,
+        pinColor = pinColor.value,
+        onPinColorChange = viewModel::updatePinColor
     )
 }
 
@@ -79,7 +83,9 @@ private fun MapScreen(
     startDate: String?,
     endDate: String?,
     onStartDateChange: (String?) -> Unit,
-    onEndDateChange: (String?) -> Unit
+    onEndDateChange: (String?) -> Unit,
+    pinColor: Color,
+    onPinColorChange: (Color) -> Unit
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -165,7 +171,9 @@ private fun MapScreen(
                         startDate = startDate,
                         endDate = endDate,
                         onStartDateChange = onStartDateChange,
-                        onEndDateChange = onEndDateChange
+                        onEndDateChange = onEndDateChange,
+                        pinColor = pinColor,
+                        onPinColorChange = onPinColorChange
                     )
                 }
             }

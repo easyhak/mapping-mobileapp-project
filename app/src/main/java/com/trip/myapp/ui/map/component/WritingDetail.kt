@@ -64,8 +64,9 @@ fun BottomSheetAddContent(
     startDate: String?,
     endDate: String?,
     onStartDateChange: (String?) -> Unit,
-    onEndDateChange: (String?) -> Unit
-
+    onEndDateChange: (String?) -> Unit,
+    pinColor: Color,
+    onPinColorChange: (Color) -> Unit
 ) {
 
     LazyColumn(
@@ -111,7 +112,7 @@ fun BottomSheetAddContent(
         }
 
         //지도
-        item { PickingLocation() }
+        item { PickingLocation(pinColor = pinColor, onPinColorChange = onPinColorChange) }
 
         //버튼
         item {
@@ -363,8 +364,11 @@ fun DateRangePickerModal(
 }
 
 @Composable
-private fun PickingLocation() {
-    var pinColor by remember { mutableStateOf(Color.Black) }  // 핀 색상 상태 관리
+private fun PickingLocation(
+    pinColor: Color,
+    onPinColorChange: (Color) -> Unit
+) {
+    //var pinColor by remember { mutableStateOf(Color.Black) }  // 핀 색상 상태 관리
     var showColorDialog by remember { mutableStateOf(false) }  // 색상 변경 다이얼로그 상태 관리
 
     Row(
@@ -407,7 +411,7 @@ private fun PickingLocation() {
     if (showColorDialog) {
         ColorPickerDialog(
             onColorSelected = { selectedColor ->
-                pinColor = selectedColor
+                onPinColorChange(selectedColor)  // 부모 컴포저블로 색상 전달
                 showColorDialog = false
             },
             onDismiss = { showColorDialog = false }
@@ -470,7 +474,9 @@ private fun PreviewBottomSheet() {
             startDate = null,
             endDate = null,
             onStartDateChange = { },
-            onEndDateChange = { }
+            onEndDateChange = { },
+            pinColor = Color.Black,
+            onPinColorChange = {}
         )
     }
 }
