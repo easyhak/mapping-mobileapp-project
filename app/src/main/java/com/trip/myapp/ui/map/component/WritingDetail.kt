@@ -58,6 +58,10 @@ fun BottomSheetAddContent(
     onContentChange: (String) -> Unit,
     selectedImages: List<String>,
     onImagesChange: (List<String>) -> Unit,
+    startDate: String?,
+    endDate: String?,
+    onStartDateChange: (String?) -> Unit,
+    onEndDateChange: (String?) -> Unit
 
 ) {
 
@@ -94,7 +98,14 @@ fun BottomSheetAddContent(
         }
 
         //날짜
-        item { PickingDate() }
+        item {
+            PickingDate(
+                startDate = startDate,
+                endDate = endDate,
+                onStartDateChange = onStartDateChange,
+                onEndDateChange = onEndDateChange
+            )
+        }
 
         //지도
         item { PickingLocation() }
@@ -241,9 +252,14 @@ private fun PickingPhoto(
 
 
 @Composable
-fun PickingDate() {
-    var startDate by remember { mutableStateOf<String?>(null) }
-    var endDate by remember { mutableStateOf<String?>(null) }
+fun PickingDate(
+    startDate: String?,
+    endDate: String?,
+    onStartDateChange: (String?) -> Unit,
+    onEndDateChange: (String?) -> Unit
+) {
+    //var startDate by remember { mutableStateOf<String?>(null) }
+    //var endDate by remember { mutableStateOf<String?>(null) }
     var isDialogOpen by remember { mutableStateOf(false) }
 
     Row(
@@ -264,13 +280,14 @@ fun PickingDate() {
 
         // 선택된 날짜 범위 표시
         Text(
-            text = if (startDate != null && endDate != null) {
+            text = if (startDate != null && endDate != null && startDate != "" && endDate != "") {
                 "$startDate ~ $endDate"
             } else {
-                "날짜를 선택하세요"
+                "시작날짜와 종료날짜를 선택하세요"
             },
             style = MaterialTheme.typography.bodyMedium,
-            color = if (startDate != null && endDate != null) MaterialTheme.colorScheme.primary else Color.Gray,
+            //color = if (startDate != null && endDate != null) MaterialTheme.colorScheme.primary else Color.Gray,
+            color = Color.Gray,
             modifier = Modifier.padding(start = 8.dp)
         )
     }
@@ -280,8 +297,14 @@ fun PickingDate() {
         DateRangePickerModal(
             onDateRangeSelected = { range ->
                 val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                startDate = range.first?.let { formatter.format(Date(it)) }
-                endDate = range.second?.let { formatter.format(Date(it)) }
+
+                onStartDateChange(range.first?.let { formatter.format(Date(it)) })
+                onEndDateChange(range.second?.let { formatter.format(Date(it)) })
+                //range.first?.let { onStartDateChange(formatter.format(Date(it))) }
+                //range.second?.let { onEndDateChange(formatter.format(Date(it))) }
+
+                //startDate = range.first?.let { formatter.format(Date(it)) }
+                //endDate = range.second?.let { formatter.format(Date(it)) }
                 isDialogOpen = false
             },
             onDismiss = { isDialogOpen = false }
@@ -366,7 +389,10 @@ private fun PreviewBottomSheet() {
             onContentChange = {},
             selectedImages = emptyList(),
             onImagesChange = {},
-
+            startDate = null,
+            endDate = null,
+            onStartDateChange = { },
+            onEndDateChange = { }
         )
     }
 }

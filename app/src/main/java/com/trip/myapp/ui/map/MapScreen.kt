@@ -36,7 +36,7 @@ import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.map.component.BottomSheetAddContent
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun MapScreen(
     onCommunityClick: () -> Unit, onArchiveClick: () -> Unit, onDetailClick: () -> Unit,
@@ -46,6 +46,8 @@ fun MapScreen(
     val title = viewModel.title.collectAsStateWithLifecycle()
     val content = viewModel.content.collectAsStateWithLifecycle()
     val selectedImages = viewModel.selectedImages.collectAsStateWithLifecycle()
+    val startDate = viewModel.startDate.collectAsStateWithLifecycle()
+    val endDate = viewModel.endDate.collectAsStateWithLifecycle()
 
     MapScreen(
         onCommunityClick = onCommunityClick,
@@ -55,7 +57,11 @@ fun MapScreen(
         onTitleChange = viewModel::updateTitle,
         onContentChange = viewModel::updateContent,
         selectedImages = selectedImages.value,
-        onImagesChange = viewModel::addSelectedImages
+        onImagesChange = viewModel::addSelectedImages,
+        startDate = startDate.value,
+        endDate = endDate.value,
+        onStartDateChange = viewModel::updateStartDate,
+        onEndDateChange = viewModel::updateEndDate
     )
 }
 
@@ -70,6 +76,10 @@ private fun MapScreen(
     onContentChange: (String) -> Unit,
     selectedImages: List<String>,
     onImagesChange: (List<String>) -> Unit,
+    startDate: String?,
+    endDate: String?,
+    onStartDateChange: (String?) -> Unit,
+    onEndDateChange: (String?) -> Unit
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -152,6 +162,10 @@ private fun MapScreen(
                         onContentChange = onContentChange,
                         selectedImages = selectedImages,
                         onImagesChange = onImagesChange,
+                        startDate = startDate,
+                        endDate = endDate,
+                        onStartDateChange = onStartDateChange,
+                        onEndDateChange = onEndDateChange
                     )
                 }
             }

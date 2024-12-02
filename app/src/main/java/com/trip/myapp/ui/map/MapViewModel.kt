@@ -22,6 +22,14 @@ class MapViewModel @Inject constructor(
     private val _selectedImages = MutableStateFlow<List<String>>(emptyList())
     val selectedImages = _selectedImages.asStateFlow()
 
+
+    private val _startDate = MutableStateFlow("")
+    val startDate = _startDate.asStateFlow()
+    private val _endDate = MutableStateFlow("")
+    val endDate = _endDate.asStateFlow()
+
+
+
     fun updateTitle(newTitle: String) {
         _title.value = newTitle
     }
@@ -33,5 +41,12 @@ class MapViewModel @Inject constructor(
 
     fun addSelectedImages(images: List<String>) {
         _selectedImages.value = images
+    }
+    fun updateStartDate(startDate: String?) {
+        _startDate.value = startDate ?: ""
+    }
+
+    fun updateEndDate(endDate: String?) {
+        _endDate.value = endDate ?: ""
     }
 }
