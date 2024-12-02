@@ -3,9 +3,12 @@ package com.trip.myapp.ui.map.component
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -241,7 +244,7 @@ private fun PickingPhoto(
                 }
             } else {
                 Text(
-                    text = "이미지를 선택하세요",
+                    text = "아이콘을 눌러 이미지를 선택해주세요",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -283,7 +286,7 @@ fun PickingDate(
             text = if (startDate != null && endDate != null && startDate != "" && endDate != "") {
                 "$startDate ~ $endDate"
             } else {
-                "시작날짜와 종료날짜를 선택하세요"
+                "아이콘을 눌러 시작날짜와 종료날짜를 \n선택해주세요"
             },
             style = MaterialTheme.typography.bodyMedium,
             //color = if (startDate != null && endDate != null) MaterialTheme.colorScheme.primary else Color.Gray,
@@ -361,19 +364,94 @@ fun DateRangePickerModal(
 
 @Composable
 private fun PickingLocation() {
+    var pinColor by remember { mutableStateOf(Color.Black) }  // 핀 색상 상태 관리
+    var showColorDialog by remember { mutableStateOf(false) }  // 색상 변경 다이얼로그 상태 관리
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 핀 아이콘
         Icon(
             imageVector = Icons.Filled.PushPin,
             contentDescription = "pin",
             modifier = Modifier
                 .padding(start = 16.dp)
-                .size(48.dp)
+                .size(48.dp),
+            tint = pinColor  // 핀 아이콘 색상 반영
         )
+
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            // 핀 위치 설정 설명 텍스트
+            Text(
+                text = "핀 아이콘을 눌러 위치를 설정해보세요",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = Color.Gray
+            )
+
+            // 색상 변경 텍스트
+            Text(
+                text = "핀 색변경",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Blue),
+                modifier = Modifier.clickable {
+                    showColorDialog = true
+                }
+            )
+        }
+    }
+
+    // 색상 변경 다이얼로그
+    if (showColorDialog) {
+        ColorPickerDialog(
+            onColorSelected = { selectedColor ->
+                pinColor = selectedColor
+                showColorDialog = false
+            },
+            onDismiss = { showColorDialog = false }
+        )
+    }
+}
+
+@Composable
+fun ColorPickerDialog(
+    onColorSelected: (Color) -> Unit,
+    onDismiss: () -> Unit
+) {
+    // 색상 선택 다이얼로그
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+
+            .padding(16.dp)
+    ) {
+        Text("색을 선택하세요", style = MaterialTheme.typography.bodyLarge)
+
+        // 색상 옵션들
+        Row(modifier = Modifier.padding(top = 16.dp)) {
+            val colors = listOf(Color.Red, Color.Blue, Color.Green, Color.Black)
+            colors.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(4.dp)
+                        .background(color = color, shape = MaterialTheme.shapes.medium)
+                        .clickable {
+                            onColorSelected(color)
+                        }
+                )
+            }
+        }
+
+        // 취소 버튼
+        TextButton(
+            onClick = onDismiss,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("취소")
+        }
     }
 }
 
