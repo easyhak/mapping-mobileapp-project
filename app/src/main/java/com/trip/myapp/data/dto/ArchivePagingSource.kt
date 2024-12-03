@@ -5,13 +5,14 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
+import com.trip.myapp.domain.model.Archive
 import kotlinx.coroutines.tasks.await
 
 class ArchivePagingSource(
     private val archiveCollection: CollectionReference,
-) : PagingSource<Query, ArchiveResponse>() {
+) : PagingSource<Query, Archive>() {
 
-    override suspend fun load(params: LoadParams<Query>): LoadResult<Query, ArchiveResponse> {
+    override suspend fun load(params: LoadParams<Query>): LoadResult<Query, Archive> {
         return try {
             val query = params.key ?: archiveCollection
                 .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -19,10 +20,10 @@ class ArchivePagingSource(
 
             val querySnapshot = query.get().await()
             val documents = querySnapshot.documents
-            val archives = mutableListOf<ArchiveResponse>()
+            val archives = mutableListOf<Archive>()
             for (document in documents) {
                 try {
-                    val communityPost = document.toObject(ArchiveResponse::class.java)
+                    val communityPost = document.toObject(Archive::class.java)
                     if (communityPost != null) {
                         archives.add(communityPost)
                     }
@@ -48,7 +49,7 @@ class ArchivePagingSource(
     }
 
 
-    override fun getRefreshKey(state: PagingState<Query, ArchiveResponse>): Query? {
+    override fun getRefreshKey(state: PagingState<Query, Archive>): Query? {
         return null
     }
 
