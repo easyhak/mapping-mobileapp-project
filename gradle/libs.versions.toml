@@ -15,6 +15,7 @@ uiTextGoogleFonts = "1.7.5"
 hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
 composeNavigation = "2.8.3"
+paging = "3.3.4"
 kotlinxSerializationJsonJvm = "1.7.3"
 ksp = "2.0.21-1.0.25"
 firebaseStorageKtx = "21.0.1"
@@ -25,6 +26,7 @@ androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-f
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
