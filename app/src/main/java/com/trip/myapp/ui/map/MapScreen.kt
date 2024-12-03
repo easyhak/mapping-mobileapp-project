@@ -32,11 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.map.component.BottomSheetAddContent
-
 
 @Composable
 fun MapScreen(
@@ -185,14 +188,28 @@ private fun MapScreen(
 
 
 @Composable
+
 fun MapContent() {
+    // 대한민국의 중심 좌표 (위도, 경도)
+    val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
+
+    // 카메라 위치 상태를 설정 (줌 레벨 10)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(koreaCenter, 10f)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.surface)
     ) {
-        Text("Map Content", style = MaterialTheme.typography.titleLarge)
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            // 지도에 마커 추가
+
+        }
     }
 }
 
