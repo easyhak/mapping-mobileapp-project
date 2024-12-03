@@ -1,5 +1,17 @@
 import java.util.Properties
 
+// local.properties 파일 읽기
+fun loadProperties(fileName: String): Properties {
+    val properties = Properties()
+    val file = rootProject.file(fileName)
+    if (file.exists()) {
+        properties.load(file.inputStream())
+    }
+    return properties
+}
+
+val localProperties = loadProperties("local.properties")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
@@ -13,12 +25,7 @@ plugins {
 android {
     signingConfigs {
         getByName("debug") {
-            val keystoreProperties = Properties().apply {
-                val file = rootProject.file("local.properties")
-                if (file.exists()) {
-                    load(file.inputStream())
-                }
-            }
+            val keystoreProperties = loadProperties("local.properties")
             val keyStorePath = keystoreProperties.getProperty("DEBUG_KEYSTORE_PATH")
             storeFile = if (keyStorePath != null) {
                 file(keyStorePath)
@@ -36,9 +43,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
-        val googleMapsApiKey: String? = project.findProperty("google_maps_api_key") as String?
-        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"${googleMapsApiKey}\"")
+        manifestPlaceholders["googleMapApiKey"] = localProperties["GOOGLE_MAP_API_KEY"] as String
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -75,6 +80,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.paging.common.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

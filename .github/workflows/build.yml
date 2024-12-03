@@ -42,6 +42,11 @@ jobs:
         run: |
           mkdir -p $HOME/.android
           echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > $HOME/.android/debug.keystore
+      - name: Set up Google Maps API Key
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAP_API_KEY }}
+        run: |
+          echo "GOOGLE_MAP_API_KEY=$GOOGLE_MAP_API_KEY" >> local.properties
 
       - name: Run Build
         run: ./gradlew build --no-daemon
