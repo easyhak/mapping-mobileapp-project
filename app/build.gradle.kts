@@ -37,6 +37,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        val googleMapsApiKey: String? = project.findProperty("google_maps_api_key") as String?
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"${googleMapsApiKey}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -58,6 +60,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -107,6 +110,6 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.firebase.firestore)
 
-    // paging
-    implementation(libs.androidx.paging.runtime)
+    //maps
+    implementation(libs.maps.compose)
 }

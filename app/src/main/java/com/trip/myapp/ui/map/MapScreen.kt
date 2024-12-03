@@ -28,15 +28,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.map.component.BottomSheetAddContent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     onCommunityClick: () -> Unit, onArchiveClick: () -> Unit, onDetailClick: () -> Unit,
@@ -45,6 +49,10 @@ fun MapScreen(
 
     val title = viewModel.title.collectAsStateWithLifecycle()
     val content = viewModel.content.collectAsStateWithLifecycle()
+    val selectedImages = viewModel.selectedImages.collectAsStateWithLifecycle()
+    val startDate = viewModel.startDate.collectAsStateWithLifecycle()
+    val endDate = viewModel.endDate.collectAsStateWithLifecycle()
+    val pinColor = viewModel.pinColor.collectAsStateWithLifecycle()
 
     MapScreen(
         onCommunityClick = onCommunityClick,
@@ -53,6 +61,14 @@ fun MapScreen(
         content = content.value,
         onTitleChange = viewModel::updateTitle,
         onContentChange = viewModel::updateContent,
+        selectedImages = selectedImages.value,
+        onImagesChange = viewModel::addSelectedImages,
+        startDate = startDate.value,
+        endDate = endDate.value,
+        onStartDateChange = viewModel::updateStartDate,
+        onEndDateChange = viewModel::updateEndDate,
+        pinColor = pinColor.value,
+        onPinColorChange = viewModel::updatePinColor
     )
 }
 
@@ -65,6 +81,14 @@ private fun MapScreen(
     content: String,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
+    selectedImages: List<String>,
+    onImagesChange: (List<String>) -> Unit,
+    startDate: String?,
+    endDate: String?,
+    onStartDateChange: (String?) -> Unit,
+    onEndDateChange: (String?) -> Unit,
+    pinColor: Color,
+    onPinColorChange: (Color) -> Unit
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -144,7 +168,15 @@ private fun MapScreen(
                         title = title,
                         content = content,
                         onTitleChange = onTitleChange,
-                        onContentChange = onContentChange
+                        onContentChange = onContentChange,
+                        selectedImages = selectedImages,
+                        onImagesChange = onImagesChange,
+                        startDate = startDate,
+                        endDate = endDate,
+                        onStartDateChange = onStartDateChange,
+                        onEndDateChange = onEndDateChange,
+                        pinColor = pinColor,
+                        onPinColorChange = onPinColorChange
                     )
                 }
             }
@@ -156,14 +188,28 @@ private fun MapScreen(
 
 
 @Composable
+
 fun MapContent() {
+    // 대한민국의 중심 좌표 (위도, 경도)
+    val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
+
+    // 카메라 위치 상태를 설정 (줌 레벨 10)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(koreaCenter, 10f)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.surface)
     ) {
-        Text("Map Content", style = MaterialTheme.typography.titleLarge)
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            // 지도에 마커 추가
+
+        }
     }
 }
 
