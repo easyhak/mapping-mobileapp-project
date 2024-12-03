@@ -18,7 +18,6 @@ class ArchiveRepository @Inject constructor(
 
     private val userCollection = firebaseFirestore.collection("users")
 
-    // 폴더만 생성
     suspend fun saveArchive(
         userId: String,
         title: String,

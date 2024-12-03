@@ -1,42 +1,103 @@
 package com.trip.myapp.ui.login
 
+import android.app.Activity
+import android.content.Intent
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.*
+import com.google.android.gms.common.api.ApiException
+import com.trip.myapp.R
 
 @Composable
 fun LoginScreen(
     onClickLoginButton: () -> Unit,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    val signInState by authViewModel.signInState.collectAsState()
+    val loginEvent by authViewModel.event.collectAsState(initial = null)
+
+    // GoogleSignInOptions 초기화
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(context.getString(R.string.default_web_client_id))
+        .requestEmail()
+        .build()
+
+    // GoogleSignInClient 초기화
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
+    // ActivityResultLauncher 설정
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result: ActivityResult ->
+            Log.d("Login", "onResult: ${result.resultCode}")
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                Log.d("Login", "onResult: data received")
+                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    val idToken = account?.idToken
+                    Log.d("Login", "onResult: idToken = $idToken")
+                    if (idToken != null) {
+                        authViewModel.loginWithGoogle(idToken)
+                    } else {
+                        Log.e("Login", "ID Token is null")
+                        authViewModel.onLoginFailure(SignInErrorMessage.GOOGLE_SIGN_IN_FAIL)
+                    }
+                } catch (e: ApiException) {
+                    Log.e("Login", "Google Sign-In Failed: ${e.statusCode}", e)
+                    authViewModel.onLoginFailure(SignInErrorMessage.GOOGLE_SIGN_IN_FAIL)
+                }
+            } else {
+                Log.e("Login", "Google Sign-In Failed: No Result")
+                authViewModel.onLoginFailure(SignInErrorMessage.GOOGLE_SIGN_IN_FAIL)
+            }
+        }
+    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Login Screen")
-        GoogleSignInButton(onClickLoginButton)
+        Text(text = "Login Screen")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        GoogleSignInButton(
+            onClick = {
+                // Google Sign-In Intent 실행
+                val signInIntent = googleSignInClient.signInIntent
+                launcher.launch(signInIntent)
+            }
+        )
+    }
+
+    LaunchedEffect(loginEvent) {
+        when (loginEvent) {
+            is LoginEvent.GoogleLoginSuccess -> onClickLoginButton()
+            is LoginEvent.LoginFailure -> {
+                Toast.makeText(context, "Google Sign-In Failed", Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
+        }
     }
 }
 
@@ -53,6 +114,3 @@ fun GoogleSignInButton(onClick: () -> Unit) {
         Text(text = "Sign in with Google")
     }
 }
-
-
-

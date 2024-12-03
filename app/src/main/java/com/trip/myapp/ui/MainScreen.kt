@@ -12,7 +12,6 @@ import com.trip.myapp.ui.map.mapGraph
 
 @Composable
 fun MainScreen(
-    onGoogleSignInClick: () -> Unit,
 ) {
     val navController = rememberNavController()
 

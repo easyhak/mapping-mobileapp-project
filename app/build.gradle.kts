@@ -21,7 +21,6 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
     id("com.google.gms.google-services")
 }
-
 android {
     signingConfigs {
         getByName("debug") {
@@ -80,7 +79,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.storage.ktx)
-    implementation(libs.androidx.paging.common.android)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -118,4 +117,12 @@ dependencies {
 
     //maps
     implementation(libs.maps.compose)
+
+    // paging3
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
+    // coil
+    implementation(libs.coil.compose)
+
 }
