@@ -44,12 +44,6 @@ import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 
-data class Folder(
-    val name: String,
-    val imageRes: Int?,
-    val isDefault: Boolean = false // 기본 폴더 여부 ('전체' 폴더는 true)
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArchiveScreen(
@@ -58,7 +52,7 @@ fun ArchiveScreen(
     onDetailClick: (String) -> Unit,
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
-    val folders by viewModel.folders.collectAsState()
+    val pagedArchives by viewModel.pagedArchives.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
     val navigationItems = listOf(
@@ -110,14 +104,7 @@ fun ArchiveScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(folders.size) { index ->
-                val folder = folders[index]
-                CardItem(
-                    title = folder.name,
-                    imageRes = folder.imageRes,
-                    modifier = Modifier
-                )
-            }
+
         }
     }
 
@@ -125,7 +112,6 @@ fun ArchiveScreen(
         AddFolderDialog(
             onDismiss = { showDialog = false },
             onAddFolder = { folderName ->
-                viewModel.addFolder(folderName) // ViewModel을 통해 폴더 추가
                 showDialog = false
             }
         )
