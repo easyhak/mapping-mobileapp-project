@@ -73,7 +73,7 @@ fun ArchiveScreen(
     onMapClick: () -> Unit,
     onDetailClick: (String) -> Unit,
     archives: LazyPagingItems<Archive>,
-    addArchive: (String) -> Unit
+    addArchive: (String, Int) -> Unit
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
@@ -134,7 +134,7 @@ fun ArchiveScreen(
                 val archive = archives[index]
                 if (archive != null) {
                     CardItem(
-                        title = archive.title,
+                        title = archive.name,
                         imageRes = null,
                     )
                 }
@@ -195,8 +195,9 @@ fun CardItem(title: String, imageRes: String?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String) -> Unit) {
+fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String, Int) -> Unit) {
     var folderName by remember { mutableStateOf(TextFieldValue("")) }
+    val color = 0
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -210,7 +211,11 @@ fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String) -> Unit) {
             )
         },
         confirmButton = {
-            TextButton(onClick = { if (folderName.text.isNotBlank()) onAddFolder(folderName.text) }) {
+            TextButton(onClick = {
+                if (folderName.text.isNotBlank()) {
+                    onAddFolder(folderName.text, color)
+                }
+            }) {
                 Text("추가")
             }
         },

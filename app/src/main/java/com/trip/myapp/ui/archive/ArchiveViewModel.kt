@@ -27,10 +27,12 @@ class ArchiveViewModel @Inject constructor(
         .cachedIn(viewModelScope)
     } ?: flowOf(PagingData.empty())
 
-    fun addArchive(title: String) {
+    fun addArchive(name: String, color: Int) {
         viewModelScope.launch {
             addArchiveUseCase(
-                title = title
+                name = name,
+                color = color,
+                isDefault = false
             )
         }
     }
