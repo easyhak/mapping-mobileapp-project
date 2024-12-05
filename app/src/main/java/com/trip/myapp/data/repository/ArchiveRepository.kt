@@ -7,6 +7,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.trip.myapp.data.dto.ArchivePagingSource
+import com.trip.myapp.data.dto.ArchiveRequest
 import com.trip.myapp.domain.model.Archive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
@@ -22,19 +23,13 @@ class ArchiveRepository @Inject constructor(
     suspend fun saveArchive(
         userId: String,
         name: String,
-        color: Int,
-        isDefault: Boolean = false
     ) {
         val userRef = userCollection.document(userId)
         val folderRef = userRef.collection("archives").document()
 
-        val request = Archive(
+        val request = ArchiveRequest(
             id = folderRef.id,
             name = name,
-            color = color,
-            isDefault = isDefault,
-            createdAt = Timestamp.now(),
-            updatedAt = Timestamp.now()
         )
 
         try {

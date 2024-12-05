@@ -43,6 +43,7 @@ class ArchivePagingSource(
                 nextKey = nextQuery,
             )
         } catch (e: Exception) {
+            Log.e("ArchivePagingSource","$e")
             Log.e("ArchivePagingSource","community post 로딩 에러")
             LoadResult.Error(e)
         }

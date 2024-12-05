@@ -10,15 +10,11 @@ class AddArchiveUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         name: String,
-        color: Int,
-        isDefault: Boolean = false
     ) {
         val author = authRepository.getUserUID() ?: throw IllegalStateException("User not signed in")
         return archiveRepository.saveArchive(
             userId = author,
             name = name,
-            color = color,
-            isDefault = isDefault
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.trip.myapp.ui.archive
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
@@ -48,7 +51,6 @@ import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArchiveScreen(
     onCommunityClick: () -> Unit,
@@ -57,6 +59,21 @@ fun ArchiveScreen(
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     val pagedArchives = viewModel.pagedArchives.collectAsLazyPagingItems()
+
+    val context = LocalContext.current
+    
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is ArchiveListEvent.AddArchive.Success -> {
+                    pagedArchives.refresh()
+                }
+                is ArchiveListEvent.AddArchive.Failure -> {
+                    Toast.makeText(context, "생성 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
     ArchiveScreen(
         onCommunityClick = onCommunityClick,
         onMapClick = onMapClick,
@@ -73,7 +90,7 @@ fun ArchiveScreen(
     onMapClick: () -> Unit,
     onDetailClick: (String) -> Unit,
     archives: LazyPagingItems<Archive>,
-    addArchive: (String, Int) -> Unit
+    addArchive: (String) -> Unit
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
@@ -134,8 +151,7 @@ fun ArchiveScreen(
                 val archive = archives[index]
                 if (archive != null) {
                     CardItem(
-                        title = archive.name,
-                        imageRes = null,
+                        archive = archive,
                     )
                 }
             }
@@ -151,7 +167,9 @@ fun ArchiveScreen(
 }
 
 @Composable
-fun CardItem(title: String, imageRes: String?, modifier: Modifier = Modifier) {
+fun CardItem(archive: Archive, modifier: Modifier = Modifier) {
+    // todo image 값 받기
+    var imageRes: String? = null
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -167,7 +185,7 @@ fun CardItem(title: String, imageRes: String?, modifier: Modifier = Modifier) {
                     .data(imageRes)
                     .crossfade(true)
                     .build(),
-                contentDescription = title,
+                contentDescription = archive.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -180,14 +198,14 @@ fun CardItem(title: String, imageRes: String?, modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .weight(1f)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colorScheme.secondary),
+                    .background(Color(archive.color)),
                 contentAlignment = Alignment.Center
             ) {
                 Text("No Image", style = MaterialTheme.typography.bodyMedium)
             }
         }
         Text(
-            text = title,
+            text = archive.name,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(top = 8.dp)
         )
@@ -195,9 +213,8 @@ fun CardItem(title: String, imageRes: String?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String, Int) -> Unit) {
+fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String) -> Unit) {
     var folderName by remember { mutableStateOf(TextFieldValue("")) }
-    val color = 0
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -213,8 +230,9 @@ fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String, Int) -> Unit) 
         confirmButton = {
             TextButton(onClick = {
                 if (folderName.text.isNotBlank()) {
-                    onAddFolder(folderName.text, color)
+                    onAddFolder(folderName.text)
                 }
+                onDismiss()
             }) {
                 Text("추가")
             }
