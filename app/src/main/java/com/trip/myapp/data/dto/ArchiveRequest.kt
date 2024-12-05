@@ -6,7 +6,7 @@ import kotlin.random.Random
 
 data class ArchiveRequest (
     val id: String = "",
-    val title: String = "",
+    val name: String = "",
     @ColorInt val  color: Int = generateRandomColor(),
     val createdAt: Timestamp = Timestamp.now(),
 ) {

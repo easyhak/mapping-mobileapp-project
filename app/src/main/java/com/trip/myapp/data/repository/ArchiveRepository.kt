@@ -3,9 +3,11 @@ package com.trip.myapp.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.trip.myapp.data.dto.ArchivePagingSource
+import com.trip.myapp.data.dto.ArchiveRequest
 import com.trip.myapp.domain.model.Archive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
@@ -20,14 +22,14 @@ class ArchiveRepository @Inject constructor(
 
     suspend fun saveArchive(
         userId: String,
-        title: String,
+        name: String,
     ) {
         val userRef = userCollection.document(userId)
         val folderRef = userRef.collection("archives").document()
 
-        val request = Archive(
+        val request = ArchiveRequest(
             id = folderRef.id,
-            title = title,
+            name = name,
         )
 
         try {
