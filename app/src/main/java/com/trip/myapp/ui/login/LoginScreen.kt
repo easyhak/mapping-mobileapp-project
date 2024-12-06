@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -17,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.signin.*
@@ -77,9 +79,14 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Login Screen")
+        // 로고 이미지
+        Image(
+            painter = painterResource(id = R.drawable.login),
+            contentDescription = "Logo",
+            modifier = Modifier.size(480.dp)
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         GoogleSignInButton(
             onClick = {
@@ -96,6 +103,7 @@ fun LoginScreen(
             is LoginEvent.LoginFailure -> {
                 Toast.makeText(context, "Google Sign-In Failed", Toast.LENGTH_SHORT).show()
             }
+
             else -> {}
         }
     }
@@ -107,9 +115,13 @@ fun GoogleSignInButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 28.dp)
     ) {
-        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Google Sign-In")
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Google Sign-In",
+            modifier = Modifier.size(24.dp)
+        )
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = "Sign in with Google")
     }
