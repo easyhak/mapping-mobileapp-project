@@ -27,7 +27,7 @@ fun NavGraphBuilder.mapGraph(navController: NavController) {
             .setLaunchSingleTop(true)
             .build()
         composable<MapGraph.MapHomeRoute> {
-            MapScreen(
+            MapHomeScreen(
                 onCommunityClick = {
                     navController.navigate(CommunityGraph, options)
                 },

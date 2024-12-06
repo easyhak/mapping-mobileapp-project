@@ -40,9 +40,10 @@ import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.map.component.BottomSheetAddContent
+import com.trip.myapp.ui.theme.AppTheme
 
 @Composable
-fun MapScreen(
+fun MapHomeScreen(
     onCommunityClick: () -> Unit, onArchiveClick: () -> Unit, onDetailClick: () -> Unit,
     viewModel: MapViewModel = hiltViewModel()
 ) {
@@ -54,7 +55,7 @@ fun MapScreen(
     val endDate = viewModel.endDate.collectAsStateWithLifecycle()
     val pinColor = viewModel.pinColor.collectAsStateWithLifecycle()
 
-    MapScreen(
+    MapHomeScreen(
         onCommunityClick = onCommunityClick,
         onArchiveClick = onArchiveClick,
         title = title.value,
@@ -74,7 +75,7 @@ fun MapScreen(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun MapScreen(
+private fun MapHomeScreen(
     onCommunityClick: () -> Unit,
     onArchiveClick: () -> Unit,
     title: String,
@@ -188,7 +189,6 @@ private fun MapScreen(
 
 
 @Composable
-
 fun MapContent() {
     // 대한민국의 중심 좌표 (위도, 경도)
     val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
@@ -229,5 +229,7 @@ fun CalendarContent() {
 @Preview
 @Composable
 private fun PreviewMapScreen() {
-    MapScreen({}, {}, { })
+    AppTheme {
+        MapHomeScreen({}, {}, { })
+    }
 }
