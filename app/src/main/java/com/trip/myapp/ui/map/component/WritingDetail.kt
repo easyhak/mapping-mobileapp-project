@@ -117,7 +117,9 @@ fun BottomSheetAddContent(
         //버튼
         item {
             Button(
-                onClick = {},
+                onClick = {
+                    /* Todo */
+                },
                 modifier = Modifier
                     .padding(vertical = 16.dp, horizontal = 20.dp)
                     .size(width = 250.dp, height = 50.dp),
@@ -262,8 +264,6 @@ fun PickingDate(
     onStartDateChange: (String?) -> Unit,
     onEndDateChange: (String?) -> Unit
 ) {
-    //var startDate by remember { mutableStateOf<String?>(null) }
-    //var endDate by remember { mutableStateOf<String?>(null) }
     var isDialogOpen by remember { mutableStateOf(false) }
 
     Row(
@@ -282,7 +282,6 @@ fun PickingDate(
                 .clickable { isDialogOpen = true }
         )
 
-        // 선택된 날짜 범위 표시
         Text(
             text = if (startDate != null && endDate != null && startDate != "" && endDate != "") {
                 "$startDate ~ $endDate"
@@ -302,13 +301,9 @@ fun PickingDate(
             onDateRangeSelected = { range ->
                 val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+                // 이 부분 수정하기
                 onStartDateChange(range.first?.let { formatter.format(Date(it)) })
                 onEndDateChange(range.second?.let { formatter.format(Date(it)) })
-                //range.first?.let { onStartDateChange(formatter.format(Date(it))) }
-                //range.second?.let { onEndDateChange(formatter.format(Date(it))) }
-
-                //startDate = range.first?.let { formatter.format(Date(it)) }
-                //endDate = range.second?.let { formatter.format(Date(it)) }
                 isDialogOpen = false
             },
             onDismiss = { isDialogOpen = false }

@@ -1,16 +1,21 @@
 package com.trip.myapp.ui.map
 
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.trip.myapp.domain.usecase.AddPostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-
+    private val addPostUseCase: AddPostUseCase
 ) : ViewModel() {
 
     private val _title = MutableStateFlow("")
@@ -19,13 +24,12 @@ class MapViewModel @Inject constructor(
     private val _content = MutableStateFlow("")
     val content = _content.asStateFlow()
 
-    // 선택된 이미지 URI 목록
     private val _selectedImages = MutableStateFlow<List<String>>(emptyList())
     val selectedImages = _selectedImages.asStateFlow()
 
-
     private val _startDate = MutableStateFlow("")
     val startDate = _startDate.asStateFlow()
+
     private val _endDate = MutableStateFlow("")
     val endDate = _endDate.asStateFlow()
 
@@ -41,7 +45,6 @@ class MapViewModel @Inject constructor(
         _content.value = content
     }
 
-
     fun addSelectedImages(images: List<String>) {
         _selectedImages.value = images
     }
@@ -55,5 +58,27 @@ class MapViewModel @Inject constructor(
 
     fun updatePinColor(pinColor: Color?) {
         _pinColor.value = pinColor ?: Color(0xFF000000)
+    }
+
+    fun savePost() {
+        viewModelScope.launch {
+            /* todo latitude longitude 넣을 수 있도록 하기 */
+            /* todo event handling */
+            try {
+                addPostUseCase(
+                    title = title.value,
+                    content = content.value,
+                    selectedImages = selectedImages.value,
+                    startDate = startDate.value,
+                    endDate = endDate.value,
+                    pinColor = pinColor.value.toArgb().toLong(),
+                    latitude = 0.0,
+                    longitude = 0.0
+                )
+            } catch (e: Exception) {
+                Log.e("MapViewModel", "savePost: $e")
+            }
+
+        }
     }
 }

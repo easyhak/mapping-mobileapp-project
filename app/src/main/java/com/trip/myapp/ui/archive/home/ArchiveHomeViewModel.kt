@@ -1,4 +1,4 @@
-package com.trip.myapp.ui.archive
+package com.trip.myapp.ui.archive.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,13 +18,13 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class ArchiveViewModel @Inject constructor(
+class ArchiveHomeViewModel @Inject constructor(
     private val fetchPagedArchivesUseCase: FetchPagedArchivesUseCase,
     private val addArchiveUseCase: AddArchiveUseCase,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    private val _event = Channel<ArchiveListEvent>(64)
+    private val _event = Channel<ArchiveHomeEvent>(64)
     val event = _event.receiveAsFlow()
 
     val pagedArchives: Flow<PagingData<Archive>> = authRepository.getUserUID()?.let { uid ->
@@ -38,10 +38,10 @@ class ArchiveViewModel @Inject constructor(
                 addArchiveUseCase(
                     name = name,
                 )
-                _event.trySend(ArchiveListEvent.AddArchive.Success)
+                _event.trySend(ArchiveHomeEvent.AddArchive.Success)
 
             } catch (e: Exception) {
-                _event.trySend(ArchiveListEvent.AddArchive.Failure)
+                _event.trySend(ArchiveHomeEvent.AddArchive.Failure)
             }
 
         }
