@@ -66,6 +66,14 @@ class PostRepository @Inject constructor(
         ).flow
     }
 
+    // post 하나 가져오기
+    suspend fun fetchPostById(
+        postId: String
+    ): Post {
+        val postDocument = postCollection.document(postId).get().await()
+        return postDocument.toObject(Post::class.java) ?: throw Exception("Post not found")
+    }
+
     // scrap 을 하기
     suspend fun scrapPost(
         userId: String,
