@@ -54,6 +54,9 @@ fun MapHomeScreen(
     val startDate = viewModel.startDate.collectAsStateWithLifecycle()
     val endDate = viewModel.endDate.collectAsStateWithLifecycle()
     val pinColor = viewModel.pinColor.collectAsStateWithLifecycle()
+    val latitude = viewModel.latitude.collectAsStateWithLifecycle()
+    val longitude = viewModel.longitude.collectAsStateWithLifecycle()
+    val address = viewModel.address.collectAsStateWithLifecycle()
 
     MapHomeScreen(
         onCommunityClick = onCommunityClick,
@@ -69,7 +72,14 @@ fun MapHomeScreen(
         onStartDateChange = viewModel::updateStartDate,
         onEndDateChange = viewModel::updateEndDate,
         pinColor = pinColor.value,
-        onPinColorChange = viewModel::updatePinColor
+        onPinColorChange = viewModel::updatePinColor,
+        latitude = latitude.value,
+        longitude = longitude.value,
+        address = address.value,
+        onLatitudeChange = viewModel::updateLatitude,
+        onLongitudeChange = viewModel::updateLongitude,
+        onAddressChange = viewModel::updateAddress
+
     )
 }
 
@@ -89,7 +99,14 @@ private fun MapHomeScreen(
     onStartDateChange: (String?) -> Unit,
     onEndDateChange: (String?) -> Unit,
     pinColor: Color,
-    onPinColorChange: (Color) -> Unit
+    onPinColorChange: (Color) -> Unit,
+    latitude: Double,
+    longitude: Double,
+    address: String,
+    onLatitudeChange: (Double) -> Unit,
+    onLongitudeChange: (Double) -> Unit,
+    onAddressChange: (String) -> Unit
+
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -177,7 +194,13 @@ private fun MapHomeScreen(
                         onStartDateChange = onStartDateChange,
                         onEndDateChange = onEndDateChange,
                         pinColor = pinColor,
-                        onPinColorChange = onPinColorChange
+                        onPinColorChange = onPinColorChange,
+                        latitude = latitude,
+                        longitude = longitude,
+                        address = address,
+                        onLatitudeChange = onLatitudeChange,
+                        onLongitudeChange = onLongitudeChange,
+                        onAddressChange = onAddressChange
                     )
                 }
             }

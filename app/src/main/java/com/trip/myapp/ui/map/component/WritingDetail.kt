@@ -36,7 +36,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -72,7 +71,13 @@ fun BottomSheetAddContent(
     onStartDateChange: (String?) -> Unit,
     onEndDateChange: (String?) -> Unit,
     pinColor: Color,
-    onPinColorChange: (Color) -> Unit
+    onPinColorChange: (Color) -> Unit,
+    latitude: Double,
+    longitude: Double,
+    address: String,
+    onLatitudeChange: (Double) -> Unit,
+    onLongitudeChange: (Double) -> Unit,
+    onAddressChange: (String) -> Unit
 ) {
 
     LazyColumn(
@@ -118,7 +123,18 @@ fun BottomSheetAddContent(
         }
 
         //지도
-        item { PickingLocation(pinColor = pinColor, onPinColorChange = onPinColorChange) }
+        item {
+            PickingLocation(
+                pinColor = pinColor,
+                onPinColorChange = onPinColorChange,
+                longitude = longitude,
+                latitude = latitude,
+                address = address,
+                onLatitudeChange = onLatitudeChange,
+                onLongitudeChange = onLongitudeChange,
+                onAddressChange = onAddressChange
+            )
+        }
 
         //버튼
         item {
@@ -367,13 +383,17 @@ fun DateRangePickerModal(
 @Composable
 private fun PickingLocation(
     pinColor: Color,
-    onPinColorChange: (Color) -> Unit
+    onPinColorChange: (Color) -> Unit,
+    longitude: Double,
+    latitude: Double,
+    address: String,
+    onLongitudeChange: (Double) -> Unit,
+    onLatitudeChange: (Double) -> Unit,
+    onAddressChange: (String) -> Unit
 ) {
     var showColorDialog by remember { mutableStateOf(false) }
     var showMapDialog by remember { mutableStateOf(false) }
-    var latitude by remember { mutableDoubleStateOf(37.5665) } // 기본 서울 위도
-    var longitude by remember { mutableDoubleStateOf(126.9780) } // 기본 서울 경도
-    var address by remember { mutableStateOf("위치를 선택하세요.") }
+
 
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState {
@@ -448,16 +468,19 @@ private fun PickingLocation(
     // 지도 다이얼로그
     if (showMapDialog) {
         MapDialog(
-            initialLatitude = latitude,
-            initialLongitude = longitude,
-            onLocationSelected = { lat, lng ->
-                latitude = lat
-                longitude = lng
-                fetchAddressFromCoordinates(lat, lng) { newAddress ->
-                    address = newAddress
+            initialLatitude = latitude, // 기존 뷰모델의 latitude 사용
+            initialLongitude = longitude, // 기존 뷰모델의 longitude 사용
+            onLocationSelected = { newLatitude, newLongitude ->
+                onLatitudeChange(newLatitude)  // 뷰모델의 latitude 변경
+                onLongitudeChange(newLongitude) // 뷰모델의 longitude 변경
+                fetchAddressFromCoordinates(newLatitude, newLongitude) { newAddress ->
+                    onAddressChange(newAddress)  // 뷰모델의 address 변경
                 }
                 cameraPositionState.position =
-                    CameraPosition.fromLatLngZoom(LatLng(lat, lng), 15f) // 카메라 상태 업데이트
+                    CameraPosition.fromLatLngZoom(
+                        LatLng(newLatitude, newLongitude),
+                        15f
+                    ) // 카메라 상태 업데이트
                 showMapDialog = false
             },
             onDismiss = { showMapDialog = false }
@@ -493,10 +516,10 @@ private fun PickingLocation(
                 .height(200.dp),
             cameraPositionState = cameraPositionState, // 공통 카메라 상태 사용
             onMapClick = { latLng ->
-                latitude = latLng.latitude
-                longitude = latLng.longitude
-                fetchAddressFromCoordinates(latLng.latitude, latLng.longitude) { newAddress ->
-                    address = newAddress
+                onLatitudeChange(latLng.latitude)  // 뷰모델의 latitude 변경
+                onLongitudeChange(latLng.longitude) // 뷰모델의 longitude 변경
+                fetchAddressFromCoordinates(latLng.latitude, latLng.longitude) { address ->
+                    onAddressChange(address)  // 뷰모델의 address 변경
                 }
                 cameraPositionState.position = CameraPosition.fromLatLngZoom(
                     LatLng(latLng.latitude, latLng.longitude),
@@ -505,7 +528,12 @@ private fun PickingLocation(
             }
         ) {
             Marker(
-                state = MarkerState(position = LatLng(latitude, longitude)),
+                state = MarkerState(
+                    position = LatLng(
+                        latitude,
+                        longitude
+                    )
+                ), // 뷰모델에서 관리하는 latitude, longitude 사용
                 title = "선택한 위치"
             )
         }
@@ -602,7 +630,14 @@ private fun PreviewBottomSheet() {
             onStartDateChange = { },
             onEndDateChange = { },
             pinColor = Color.Black,
-            onPinColorChange = {}
+            onPinColorChange = {},
+            latitude = 37.1,
+            longitude = 120.1,
+            onLatitudeChange = {},
+            onLongitudeChange = {
+            },
+            onAddressChange = {},
+            address = ""
         )
     }
 }
