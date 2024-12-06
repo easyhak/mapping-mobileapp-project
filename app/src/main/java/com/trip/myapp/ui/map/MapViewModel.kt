@@ -36,6 +36,14 @@ class MapViewModel @Inject constructor(
     private val _pinColor = MutableStateFlow(Color(0xFF000000))
     val pinColor = _pinColor.asStateFlow()
 
+    private val _latitude = MutableStateFlow(37.5665)
+    val latitude = _latitude.asStateFlow()
+
+    private val _longitude = MutableStateFlow(126.9780)
+    val longitude = _longitude.asStateFlow()
+
+    private val _address = MutableStateFlow("")
+    val address = _address.asStateFlow()
 
     fun updateTitle(newTitle: String) {
         _title.value = newTitle
@@ -59,6 +67,18 @@ class MapViewModel @Inject constructor(
     fun updatePinColor(pinColor: Color?) {
         _pinColor.value = pinColor ?: Color(0xFF000000)
     }
+    fun updateLongitude(longitude: Double) {
+        _longitude.value = longitude
+    }
+
+    fun updateLatitude(latitude: Double) {
+        _latitude.value = latitude
+    }
+
+    fun updateAddress(address: String) {
+        _address.value = address
+    }
+
 
     fun savePost() {
         viewModelScope.launch {
@@ -72,8 +92,9 @@ class MapViewModel @Inject constructor(
                     startDate = startDate.value,
                     endDate = endDate.value,
                     pinColor = pinColor.value.toArgb().toLong(),
-                    latitude = 0.0,
-                    longitude = 0.0
+                    latitude = latitude.value,
+                    longitude = longitude.value,
+                    address = address.value
                 )
             } catch (e: Exception) {
                 Log.e("MapViewModel", "savePost: $e")
@@ -81,4 +102,5 @@ class MapViewModel @Inject constructor(
 
         }
     }
+
 }

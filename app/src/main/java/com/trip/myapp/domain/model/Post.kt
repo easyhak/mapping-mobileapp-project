@@ -13,6 +13,7 @@ data class Post(
     @ColorLong val pinColor: Long = 0xFF000000,
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
+    val address: String = "",
     val userId: String = "",
     val createdAt: Timestamp = Timestamp.now(),
 )

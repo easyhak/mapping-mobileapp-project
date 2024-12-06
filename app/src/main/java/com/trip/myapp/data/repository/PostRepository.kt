@@ -28,6 +28,7 @@ class PostRepository @Inject constructor(
         latitude: Double,
         longitude: Double,
         pinColor: Long,
+        address: String
     ) {
         val postRef = postCollection.document()
 
@@ -43,6 +44,7 @@ class PostRepository @Inject constructor(
             latitude = latitude,
             longitude = longitude,
             pinColor = pinColor,
+            address = address
         )
 
         try {

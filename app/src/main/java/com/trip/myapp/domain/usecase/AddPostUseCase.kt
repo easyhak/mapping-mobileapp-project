@@ -16,7 +16,8 @@ class AddPostUseCase @Inject constructor(
         endDate: String,
         pinColor: Long,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        address: String
     ) {
         val userId = authRepository.getUserUID() ?: throw IllegalStateException("User is not signed in")
         val userProfileImageUrl = authRepository.getUserPhotoUrl() ?: throw IllegalStateException("User is not signed in")
@@ -30,7 +31,8 @@ class AddPostUseCase @Inject constructor(
             endDate = endDate,
             pinColor = pinColor,
             latitude = latitude,
-            longitude = longitude
+            longitude = longitude,
+            address = address
         )
     }
 }
