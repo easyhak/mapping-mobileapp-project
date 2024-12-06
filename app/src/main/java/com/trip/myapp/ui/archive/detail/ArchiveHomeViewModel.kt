@@ -1,4 +1,4 @@
-package com.trip.myapp.ui.archive
+package com.trip.myapp.ui.archive.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class ArchiveViewModel @Inject constructor(
+class ArchiveHomeViewModel @Inject constructor(
     private val fetchPagedArchivesUseCase: FetchPagedArchivesUseCase,
     private val addArchiveUseCase: AddArchiveUseCase,
     private val authRepository: AuthRepository,

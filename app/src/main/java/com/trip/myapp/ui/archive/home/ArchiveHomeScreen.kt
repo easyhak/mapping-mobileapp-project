@@ -1,4 +1,4 @@
-package com.trip.myapp.ui.archive
+package com.trip.myapp.ui.archive.home
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -52,7 +52,7 @@ import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 
 @Composable
-fun ArchiveScreen(
+fun ArchiveListScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
     onDetailClick: (String) -> Unit,
@@ -74,7 +74,7 @@ fun ArchiveScreen(
             }
         }
     }
-    ArchiveScreen(
+    ArchiveListScreen(
         onCommunityClick = onCommunityClick,
         onMapClick = onMapClick,
         onDetailClick = onDetailClick,
@@ -85,7 +85,7 @@ fun ArchiveScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchiveScreen(
+fun ArchiveListScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
     onDetailClick: (String) -> Unit,
@@ -248,7 +248,7 @@ fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewArchiveScreen() {
-    ArchiveScreen(
+    ArchiveListScreen(
         onCommunityClick = {},
         onMapClick = {},
         onDetailClick = {}

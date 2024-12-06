@@ -28,7 +28,7 @@ fun NavGraphBuilder.archiveGraph(navController: NavController) {
                 .setPopUpTo(ArchiveGraph, inclusive = false, saveState = true)
                 .setLaunchSingleTop(true)
                 .build()
-            ArchiveScreen(
+            ArchiveListScreen(
                 onCommunityClick = {
                     navController.navigate(CommunityGraph, options)
                 },

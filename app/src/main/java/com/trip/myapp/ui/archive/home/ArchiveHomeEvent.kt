@@ -1,4 +1,4 @@
-package com.trip.myapp.ui.archive
+package com.trip.myapp.ui.archive.home
 
 sealed class ArchiveListEvent {
     sealed class AddArchive : ArchiveListEvent() {
