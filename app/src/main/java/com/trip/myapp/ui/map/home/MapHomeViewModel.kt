@@ -1,4 +1,4 @@
-package com.trip.myapp.ui.map
+package com.trip.myapp.ui.map.home
 
 
 import android.util.Log
@@ -8,15 +8,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trip.myapp.domain.usecase.AddPostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel @Inject constructor(
+class MapHomeViewModel @Inject constructor(
     private val addPostUseCase: AddPostUseCase
 ) : ViewModel() {
+
+    private val _event = Channel<MapHomeEvent>(64)
+    val event = _event.receiveAsFlow()
 
     private val _title = MutableStateFlow("")
     val title = _title.asStateFlow()
@@ -44,6 +49,9 @@ class MapViewModel @Inject constructor(
 
     private val _address = MutableStateFlow("")
     val address = _address.asStateFlow()
+
+    private val _showBottomSheet = MutableStateFlow(false)
+    val showBottomSheet = _showBottomSheet.asStateFlow()
 
     fun updateTitle(newTitle: String) {
         _title.value = newTitle
@@ -79,11 +87,26 @@ class MapViewModel @Inject constructor(
         _address.value = address
     }
 
+    fun updateShowBottomSheet(showBottomSheet: Boolean) {
+        _showBottomSheet.value = showBottomSheet
+    }
+
+    fun resetAll() {
+        _title.value = ""
+        _content.value = ""
+        _selectedImages.value = emptyList()
+        _startDate.value = ""
+        _endDate.value = ""
+        _pinColor.value = Color(0xFF000000)
+        _latitude.value = 37.5665
+        _longitude.value = 126.9780
+        _address.value = ""
+    }
 
     fun savePost() {
         viewModelScope.launch {
             /* todo latitude longitude 넣을 수 있도록 하기 */
-            /* todo event handling */
+
             try {
                 addPostUseCase(
                     title = title.value,
@@ -96,8 +119,10 @@ class MapViewModel @Inject constructor(
                     longitude = longitude.value,
                     address = address.value
                 )
+                _event.trySend(MapHomeEvent.AddPost.Success)
             } catch (e: Exception) {
                 Log.e("MapViewModel", "savePost: $e")
+                _event.trySend(MapHomeEvent.AddPost.Failure)
             }
 
         }
