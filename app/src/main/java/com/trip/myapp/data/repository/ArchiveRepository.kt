@@ -3,7 +3,6 @@ package com.trip.myapp.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.trip.myapp.data.dto.ArchivePagingSource
@@ -25,15 +24,15 @@ class ArchiveRepository @Inject constructor(
         name: String,
     ) {
         val userRef = userCollection.document(userId)
-        val folderRef = userRef.collection("archives").document()
+        val archiveRef = userRef.collection("archives").document()
 
         val request = ArchiveRequest(
-            id = folderRef.id,
+            id = archiveRef.id,
             name = name,
         )
 
         try {
-            folderRef.set(request).await()
+            archiveRef.set(request).await()
         } catch (e: Exception) {
             throw e
         }

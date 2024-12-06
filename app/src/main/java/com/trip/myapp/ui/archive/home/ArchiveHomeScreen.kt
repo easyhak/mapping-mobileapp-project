@@ -2,6 +2,7 @@ package com.trip.myapp.ui.archive.home
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,29 +53,30 @@ import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 
 @Composable
-fun ArchiveListScreen(
+fun ArchiveHomeScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
     onDetailClick: (String) -> Unit,
-    viewModel: ArchiveViewModel = hiltViewModel()
+    viewModel: ArchiveHomeViewModel = hiltViewModel()
 ) {
     val pagedArchives = viewModel.pagedArchives.collectAsLazyPagingItems()
 
     val context = LocalContext.current
-    
+
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
-                is ArchiveListEvent.AddArchive.Success -> {
+                is ArchiveHomeEvent.AddArchive.Success -> {
                     pagedArchives.refresh()
                 }
-                is ArchiveListEvent.AddArchive.Failure -> {
+
+                is ArchiveHomeEvent.AddArchive.Failure -> {
                     Toast.makeText(context, "생성 실패", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-    ArchiveListScreen(
+    ArchiveHomeScreen(
         onCommunityClick = onCommunityClick,
         onMapClick = onMapClick,
         onDetailClick = onDetailClick,
@@ -85,7 +87,7 @@ fun ArchiveListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchiveListScreen(
+fun ArchiveHomeScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
     onDetailClick: (String) -> Unit,
@@ -168,21 +170,20 @@ fun ArchiveListScreen(
 
 @Composable
 fun CardItem(archive: Archive, modifier: Modifier = Modifier) {
-    // todo image 값 받기
-    var imageRes: String? = null
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .clickable { }
             .aspectRatio(1f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.primary)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (!imageRes.isNullOrEmpty()) {
+        if (archive.thumbnailImageUrl.isNotEmpty()) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageRes)
+                    .data(archive.thumbnailImageUrl.isNotEmpty())
                     .crossfade(true)
                     .build(),
                 contentDescription = archive.name,
@@ -248,7 +249,7 @@ fun AddArchiveDialog(onDismiss: () -> Unit, onAddFolder: (String) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewArchiveScreen() {
-    ArchiveListScreen(
+    ArchiveHomeScreen(
         onCommunityClick = {},
         onMapClick = {},
         onDetailClick = {}
