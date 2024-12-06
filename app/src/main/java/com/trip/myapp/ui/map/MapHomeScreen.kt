@@ -78,7 +78,8 @@ fun MapHomeScreen(
         address = address.value,
         onLatitudeChange = viewModel::updateLatitude,
         onLongitudeChange = viewModel::updateLongitude,
-        onAddressChange = viewModel::updateAddress
+        onAddressChange = viewModel::updateAddress,
+        onSaveClick = viewModel::savePost
 
     )
 }
@@ -105,7 +106,8 @@ private fun MapHomeScreen(
     address: String,
     onLatitudeChange: (Double) -> Unit,
     onLongitudeChange: (Double) -> Unit,
-    onAddressChange: (String) -> Unit
+    onAddressChange: (String) -> Unit,
+    onSaveClick: () -> Unit
 
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -200,7 +202,8 @@ private fun MapHomeScreen(
                         address = address,
                         onLatitudeChange = onLatitudeChange,
                         onLongitudeChange = onLongitudeChange,
-                        onAddressChange = onAddressChange
+                        onAddressChange = onAddressChange,
+                        onSaveClick = onSaveClick
                     )
                 }
             }

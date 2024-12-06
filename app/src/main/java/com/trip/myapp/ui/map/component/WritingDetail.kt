@@ -77,7 +77,8 @@ fun BottomSheetAddContent(
     address: String,
     onLatitudeChange: (Double) -> Unit,
     onLongitudeChange: (Double) -> Unit,
-    onAddressChange: (String) -> Unit
+    onAddressChange: (String) -> Unit,
+    onSaveClick: () -> Unit
 ) {
 
     LazyColumn(
@@ -140,7 +141,7 @@ fun BottomSheetAddContent(
         item {
             Button(
                 onClick = {
-                    /* Todo */
+                    onSaveClick()
                 },
                 modifier = Modifier
                     .padding(vertical = 16.dp, horizontal = 20.dp)
@@ -165,7 +166,6 @@ private fun ShowingTitle() {
 }
 
 @Composable
-
 private fun WritingTitle(
     title: String,
     onTitleChange: (String) -> Unit,
@@ -637,7 +637,8 @@ private fun PreviewBottomSheet() {
             onLongitudeChange = {
             },
             onAddressChange = {},
-            address = ""
+            address = "",
+            onSaveClick = {}
         )
     }
 }
