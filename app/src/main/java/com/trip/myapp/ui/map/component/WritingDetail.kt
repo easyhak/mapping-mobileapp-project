@@ -282,7 +282,6 @@ fun PickingDate(
                 .clickable { isDialogOpen = true }
         )
 
-        // 선택된 날짜 범위 표시
         Text(
             text = if (startDate != null && endDate != null && startDate != "" && endDate != "") {
                 "$startDate ~ $endDate"

@@ -5,30 +5,31 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
-import com.trip.myapp.domain.model.Archive
+import com.trip.myapp.domain.model.Post
 import kotlinx.coroutines.tasks.await
 
-class ArchivePagingSource(
-    private val archiveCollection: CollectionReference,
-) : PagingSource<Query, Archive>() {
+class PostPagingSource(
+    private val postCollection: CollectionReference
+) : PagingSource<Query, Post>() {
 
-    override suspend fun load(params: LoadParams<Query>): LoadResult<Query, Archive> {
+    override suspend fun load(params: LoadParams<Query>): LoadResult<Query, Post> {
         return try {
-            val query = params.key ?: archiveCollection
+            val query = params.key ?: postCollection
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(params.loadSize.toLong())
 
             val querySnapshot = query.get().await()
             val documents = querySnapshot.documents
-            val archives = mutableListOf<Archive>()
+            val posts = mutableListOf<Post>()
             for (document in documents) {
                 try {
-                    val communityPost = document.toObject(Archive::class.java)
-                    if (communityPost != null) {
-                        archives.add(communityPost)
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        posts.add(post)
                     }
                 } catch (e: Exception) {
-                    Log.e("ArchivePagingSource","community post 변환 에러")
+                    Log.e("PostPagingSource", "post 변환 에러")
+                    Log.e("PostPagingSource", "$e")
                 }
             }
             val nextQuery = if (documents.isNotEmpty()) {
@@ -38,18 +39,17 @@ class ArchivePagingSource(
             }
 
             LoadResult.Page(
-                data = archives,
+                data = posts,
                 prevKey = null,
                 nextKey = nextQuery,
             )
         } catch (e: Exception) {
-            Log.e("ArchivePagingSource","$e")
-            Log.e("ArchivePagingSource","community post 로딩 에러")
+            Log.e("PostPagingSource", "$e")
             LoadResult.Error(e)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Query, Archive>): Query? {
+    override fun getRefreshKey(state: PagingState<Query, Post>): Query? {
         return null
     }
 }
