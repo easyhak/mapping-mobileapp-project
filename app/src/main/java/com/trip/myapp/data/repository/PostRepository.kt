@@ -1,21 +1,29 @@
 package com.trip.myapp.data.repository
 
+import android.net.Uri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.trip.myapp.data.dto.PostPagingSource
 import com.trip.myapp.data.dto.PostRequest
 import com.trip.myapp.domain.model.Post
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseStorage: FirebaseStorage
 ) {
     private val postCollection = firebaseFirestore.collection("posts")
     private val userCollection = firebaseFirestore.collection("users")
+    private val imageStorage = firebaseStorage.reference.child("images")
 
     suspend fun savePost(
         userId: String,
@@ -29,14 +37,23 @@ class PostRepository @Inject constructor(
         longitude: Double,
         pinColor: Long,
         address: String
-    ) {
+    ): Unit = coroutineScope {
         val postRef = postCollection.document()
+
+        val uploadedImageUrlList = imageUrlList.mapIndexed { index, uriString ->
+            async(Dispatchers.IO) {
+                val imageUri = Uri.parse(uriString)
+                val imageRef = imageStorage.child("${postRef.id}/image_$index.jpg")
+                imageRef.putFile(imageUri).await()
+                imageRef.downloadUrl.await().toString()
+            }
+        }.awaitAll()
 
         val request = PostRequest(
             id = postRef.id,
             title = title,
             content = content,
-            imageUrlList = imageUrlList,
+            imageUrlList = uploadedImageUrlList,
             startDate = startDate,
             endDate = endDate,
             userId = userId,
@@ -64,6 +81,14 @@ class PostRepository @Inject constructor(
                 )
             }
         ).flow
+    }
+
+    // post 하나 가져오기
+    suspend fun fetchPostById(
+        postId: String
+    ): Post {
+        val postDocument = postCollection.document(postId).get().await()
+        return postDocument.toObject(Post::class.java) ?: throw Exception("Post not found")
     }
 
     // scrap 을 하기

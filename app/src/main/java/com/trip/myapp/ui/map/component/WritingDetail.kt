@@ -4,7 +4,6 @@ package com.trip.myapp.ui.map.component
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
-import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -227,13 +226,14 @@ private fun PickingPhoto(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments(),
         onResult = { uris ->
-            val names = uris.mapNotNull { uri ->
-                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    cursor.moveToFirst()
-                    if (nameIndex != -1) cursor.getString(nameIndex) else null
-                }
-            }
+//            val names = uris.mapNotNull { uri ->
+//                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+//                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+//                    cursor.moveToFirst()
+//                    if (nameIndex != -1) cursor.getString(nameIndex) else null
+//                }
+//            }
+            val names = uris.map {it.toString()}
             // 선택된 이미지 목록 업데이트
             onImagesChange(names)
         }
@@ -260,13 +260,11 @@ private fun PickingPhoto(
         // 선택한 이미지 이름 표시
         Column(modifier = Modifier.padding(start = 8.dp)) {
             if (selectedImages.isNotEmpty()) {
-                selectedImages.forEach { imageName ->
-                    Text(
-                        text = imageName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                }
+                Text(
+                    text = "${selectedImages.size}개 선택",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
             } else {
                 Text(
                     text = "아이콘을 눌러 이미지를 선택해주세요",
