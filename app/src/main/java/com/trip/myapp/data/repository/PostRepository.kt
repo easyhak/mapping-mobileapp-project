@@ -27,6 +27,7 @@ class PostRepository @Inject constructor(
 
     suspend fun savePost(
         userId: String,
+        userName: String,
         title: String,
         content: String,
         imageUrlList: List<String>,
@@ -57,6 +58,7 @@ class PostRepository @Inject constructor(
             startDate = startDate,
             endDate = endDate,
             userId = userId,
+            userName = userName,
             userProfileImageUrl = userProfileImageUrl,
             latitude = latitude,
             longitude = longitude,

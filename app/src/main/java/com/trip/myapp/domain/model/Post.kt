@@ -15,5 +15,6 @@ data class Post(
     val longitude: Double = 0.0,
     val address: String = "",
     val userId: String = "",
+    val userName: String = "",
     val createdAt: Timestamp = Timestamp.now(),
 )
