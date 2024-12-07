@@ -60,7 +60,7 @@ fun CommunityPostCard(
             Spacer(modifier = Modifier.size(8.dp))
             Column {
                 Text(text = post.userName, style = MaterialTheme.typography.bodySmall)
-                Text(text = "송파구", style = MaterialTheme.typography.bodySmall)
+                Text(text = post.address, style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(modifier = Modifier.weight(1f))
