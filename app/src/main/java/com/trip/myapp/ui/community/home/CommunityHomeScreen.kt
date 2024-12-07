@@ -1,6 +1,7 @@
 package com.trip.myapp.ui.community.home
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -9,21 +10,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
+import com.trip.myapp.ui.archive.detail.PostCardItem
+import com.trip.myapp.ui.archive.home.CardItem
+import com.trip.myapp.ui.archive.home.component.CommunityPostCard
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
-fun CommunityScreen(
+fun CommunityHomeScreen(
     onMapClick: () -> Unit, onArchiveClick: () -> Unit,
     viewModel: CommunityHomeViewModel = hiltViewModel()
 ) {
 
     val posts = viewModel.pagedPosts.collectAsLazyPagingItems()
-    CommunityScreen(
+    CommunityHomeScreen(
         onMapClick = onMapClick,
         onArchiveClick = onArchiveClick,
         post = posts
@@ -33,7 +40,7 @@ fun CommunityScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommunityScreen(
+private fun CommunityHomeScreen(
     onMapClick: () -> Unit,
     onArchiveClick: () -> Unit,
     post: LazyPagingItems<Post>
@@ -68,16 +75,33 @@ fun CommunityScreen(
             )
         }
     ) { innerPadding ->
-        Text("커뮤니티 화면", modifier = Modifier.padding(innerPadding))
+
+        LazyColumn(
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            items(
+                count = post.itemCount,
+                key = { index -> post[index]?.id ?: index }
+            ) { index ->
+                val postItem = post[index]
+                if (postItem != null) {
+                    CommunityPostCard(
+                        post = postItem,
+                    )
+                }
+            }
+        }
 
     }
 }
 
 
-
-
 @Preview
 @Composable
 private fun CommunityScreenPreview() {
-    CommunityScreen({}, {})
+    CommunityHomeScreen(
+        onArchiveClick = {},
+        onMapClick = {},
+        post = flowOf(PagingData.from(listOf(Post()))).collectAsLazyPagingItems()
+    )
 }

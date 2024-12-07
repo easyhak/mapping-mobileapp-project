@@ -7,7 +7,7 @@ data class Post(
     val id: String = "",
     val title: String = "",
     val content: String = "",
-    val imageList: List<String> = emptyList(),
+    val imageUrlList: List<String> = emptyList(),
     val startDate: String = "",
     val endDate: String = "",
     @ColorLong val pinColor: Long = 0xFF000000,
@@ -16,5 +16,6 @@ data class Post(
     val address: String = "",
     val userId: String = "",
     val userName: String = "",
+    val userProfileImageUrl: String = "",
     val createdAt: Timestamp = Timestamp.now(),
 )

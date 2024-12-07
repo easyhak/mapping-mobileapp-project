@@ -58,8 +58,8 @@ fun ArchiveDetailScreen(post: Post) {
                 .padding(16.dp)
         ) {
             items(
-                count = post.imageList.size,
-                key = { index -> post.imageList[index] }
+                count = post.imageUrlList.size,
+                key = { index -> post.imageUrlList[index] }
             ) { index ->
                 PostCardItem(post = post)
             }
@@ -80,7 +80,7 @@ fun PostCardItem(post: Post) {
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (post.imageList.isNotEmpty()) {
+        if (post.imageUrlList.isNotEmpty()) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data("https://picsum.photos/200/300")
@@ -118,7 +118,7 @@ fun PreviewArchiveDetailCard() {
                 id = "1",
                 title = "Title",
                 content = "Content",
-                imageList = listOf("https://picsum.photos/200/300"),
+                imageUrlList = listOf("https://picsum.photos/200/300"),
                 startDate = "",
                 endDate = "",
                 pinColor = 0,
