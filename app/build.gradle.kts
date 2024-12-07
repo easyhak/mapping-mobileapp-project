@@ -78,7 +78,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.firebase.storage.ktx)
     implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -114,6 +113,7 @@ dependencies {
     implementation(libs.firebase.ui.auth)
     implementation(libs.play.services.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage.ktx)
 
     //maps
     implementation(libs.maps.compose)
