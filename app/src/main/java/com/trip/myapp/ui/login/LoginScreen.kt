@@ -9,10 +9,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -117,9 +114,9 @@ fun GoogleSignInButton(onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 28.dp)
     ) {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Google Sign-In",
+        Image(
+            painter = painterResource(id = R.drawable.google_logo),
+            contentDescription = "Google Sign-In Logo",
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
