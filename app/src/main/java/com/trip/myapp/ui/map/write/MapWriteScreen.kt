@@ -1,9 +1,9 @@
-package com.trip.myapp.ui.map.component
-
+package com.trip.myapp.ui.map.write
 
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -17,23 +17,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +49,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -55,10 +63,67 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
-// ModalBottomSheet 안의 내용을 별도로 분리한 컴포저블 함수
 @Composable
-fun BottomSheetAddContent(
+fun MapWriteScreen(
+    onBackClick: () -> Unit,
+    viewModel: MapWriteViewModel = hiltViewModel()
+) {
+    val title = viewModel.title.collectAsStateWithLifecycle()
+    val content = viewModel.content.collectAsStateWithLifecycle()
+    val selectedImages = viewModel.selectedImages.collectAsStateWithLifecycle()
+    val startDate = viewModel.startDate.collectAsStateWithLifecycle()
+    val endDate = viewModel.endDate.collectAsStateWithLifecycle()
+    val pinColor = viewModel.pinColor.collectAsStateWithLifecycle()
+    val latitude = viewModel.latitude.collectAsStateWithLifecycle()
+    val longitude = viewModel.longitude.collectAsStateWithLifecycle()
+    val address = viewModel.address.collectAsStateWithLifecycle()
+
+    // 성공했을 때 event 처리하기
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is MapWriteEvent.AddPost.Success -> {
+                    onBackClick()
+                }
+
+                is MapWriteEvent.AddPost.Failure -> {
+                    Toast.makeText(context, "업로드 실패", Toast.LENGTH_SHORT).show()
+                }
+
+                MapWriteEvent.AddPost.Loading -> {}
+            }
+        }
+    }
+
+
+    MapWriteScreen(
+        title = title.value,
+        content = content.value,
+        onTitleChange = viewModel::updateTitle,
+        onContentChange = viewModel::updateContent,
+        selectedImages = selectedImages.value,
+        onImagesChange = viewModel::addSelectedImages,
+        startDate = startDate.value,
+        endDate = endDate.value,
+        onStartDateChange = viewModel::updateStartDate,
+        onEndDateChange = viewModel::updateEndDate,
+        pinColor = pinColor.value,
+        onPinColorChange = viewModel::updatePinColor,
+        latitude = latitude.value,
+        longitude = longitude.value,
+        address = address.value,
+        onLatitudeChange = viewModel::updateLatitude,
+        onLongitudeChange = viewModel::updateLongitude,
+        onAddressChange = viewModel::updateAddress,
+        onSaveClick = viewModel::savePost,
+        onBackClick = onBackClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MapWriteScreen(
     title: String,
     content: String,
     onTitleChange: (String) -> Unit,
@@ -77,91 +142,95 @@ fun BottomSheetAddContent(
     onLatitudeChange: (Double) -> Unit,
     onLongitudeChange: (Double) -> Unit,
     onAddressChange: (String) -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // bottom sheet 제목
-        item { ShowingTitle() }
-
-        // 제목
-        item {
-            WritingTitle(
-                title = title,
-                onTitleChange = onTitleChange
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = "여행 기록하기") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로가기")
+                    }
+                }
             )
-        }
+        },
 
-        //내용
-        item {
-            WritingExplanation(
-                content = content,
-                onContentChange = onContentChange
-            )
-        }
-        //사진
-        item {
-            PickingPhoto(
-                selectedImages = selectedImages,
-                onImagesChange = onImagesChange
-            )
-        }
+        ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        //날짜
-        item {
-            PickingDate(
-                startDate = startDate,
-                endDate = endDate,
-                onStartDateChange = onStartDateChange,
-                onEndDateChange = onEndDateChange
-            )
-        }
+            // 제목
+            item {
+                WritingTitle(
+                    title = title,
+                    onTitleChange = onTitleChange
+                )
+            }
 
-        //지도
-        item {
-            PickingLocation(
-                pinColor = pinColor,
-                onPinColorChange = onPinColorChange,
-                longitude = longitude,
-                latitude = latitude,
-                address = address,
-                onLatitudeChange = onLatitudeChange,
-                onLongitudeChange = onLongitudeChange,
-                onAddressChange = onAddressChange
-            )
-        }
+            //내용
+            item {
+                WritingExplanation(
+                    content = content,
+                    onContentChange = onContentChange
+                )
+            }
+            //사진
+            item {
+                PickingPhoto(
+                    selectedImages = selectedImages,
+                    onImagesChange = onImagesChange
+                )
+            }
 
-        //버튼
-        item {
-            Button(
-                onClick = {
-                    onSaveClick()
-                },
-                modifier = Modifier
-                    .padding(vertical = 16.dp, horizontal = 20.dp)
-                    .size(width = 250.dp, height = 50.dp),
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary),
-                enabled = true
+            //날짜
+            item {
+                PickingDate(
+                    startDate = startDate,
+                    endDate = endDate,
+                    onStartDateChange = onStartDateChange,
+                    onEndDateChange = onEndDateChange
+                )
+            }
 
-            ) {
-                Text(text = "기록 완료")
+            //지도
+            item {
+                PickingLocation(
+                    pinColor = pinColor,
+                    onPinColorChange = onPinColorChange,
+                    longitude = longitude,
+                    latitude = latitude,
+                    address = address,
+                    onLatitudeChange = onLatitudeChange,
+                    onLongitudeChange = onLongitudeChange,
+                    onAddressChange = onAddressChange
+                )
+            }
+
+            //버튼
+            item {
+                Button(
+                    onClick = {
+                        onSaveClick()
+                    },
+                    modifier = Modifier
+                        .padding(vertical = 16.dp, horizontal = 20.dp)
+                        .size(width = 250.dp, height = 50.dp),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                ) {
+                    Text(text = "기록 완료")
+                }
             }
         }
-    }
-}
 
-@Composable
-private fun ShowingTitle() {
-    Text(
-        text = "여행 기록하기",
-        style = MaterialTheme.typography.headlineLarge,
-        modifier = Modifier.padding(bottom = 16.dp)
-    )
+    }
 }
 
 @Composable
@@ -233,7 +302,7 @@ private fun PickingPhoto(
 //                    if (nameIndex != -1) cursor.getString(nameIndex) else null
 //                }
 //            }
-            val names = uris.map {it.toString()}
+            val names = uris.map { it.toString() }
             // 선택된 이미지 목록 업데이트
             onImagesChange(names)
         }
@@ -278,7 +347,7 @@ private fun PickingPhoto(
 
 
 @Composable
-fun PickingDate(
+private fun PickingDate(
     startDate: String?,
     endDate: String?,
     onStartDateChange: (String?) -> Unit,
@@ -333,7 +402,7 @@ fun PickingDate(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateRangePickerModal(
+private fun DateRangePickerModal(
     onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -367,6 +436,11 @@ fun DateRangePickerModal(
             title = {
                 Text(
                     text = "당일치기 여행인 경우, 날짜를 두번 눌러 선택 해주세요~!"
+                )
+            },
+            headline = {
+                Text(
+                    text = "여행 기간을 선택하세요"
                 )
             },
             showModeToggle = false,
@@ -532,6 +606,8 @@ private fun PickingLocation(
                         longitude
                     )
                 ), // 뷰모델에서 관리하는 latitude, longitude 사용
+                /* Todo 아이콘 모양 변경하기 */
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
                 title = "선택한 위치"
             )
         }
@@ -540,7 +616,7 @@ private fun PickingLocation(
 
 // 지도 다이얼로그
 @Composable
-fun MapDialog(
+private fun MapDialog(
     initialLatitude: Double,
     initialLongitude: Double,
     onLocationSelected: (Double, Double) -> Unit,
@@ -571,8 +647,9 @@ fun MapDialog(
         }
     )
 }
+
 @Composable
-fun ColorPickerDialog(
+private fun ColorPickerDialog(
     onColorSelected: (Color) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -611,12 +688,11 @@ fun ColorPickerDialog(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewBottomSheet() {
     AppTheme {
-        BottomSheetAddContent(
+        MapWriteScreen(
             title = "여행 기록",
             content = "우와",
             onTitleChange = {},
@@ -636,7 +712,8 @@ private fun PreviewBottomSheet() {
             },
             onAddressChange = {},
             address = "",
-            onSaveClick = {}
+            onSaveClick = {},
+            onBackClick = {}
         )
     }
 }
@@ -645,6 +722,8 @@ private fun PreviewBottomSheet() {
 @Composable
 private fun PreviewCalendar() {
     AppTheme {
-        DateRangePickerModal(onDateRangeSelected = {}, onDismiss = {})
+        DateRangePickerModal(
+            onDateRangeSelected = {},
+            onDismiss = {})
     }
 }
