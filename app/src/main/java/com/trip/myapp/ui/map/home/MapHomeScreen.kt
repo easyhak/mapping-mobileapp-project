@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,7 +65,8 @@ fun MapHomeScreen(
     viewModel: MapHomeViewModel = hiltViewModel()
 ) {
     val posts = viewModel.postList.collectAsStateWithLifecycle()
-
+    val loginEmail = viewModel.loginEmail
+    var showEmailDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
@@ -86,7 +89,24 @@ fun MapHomeScreen(
         onWriteClick = onWriteClick,
         onSignOutClick = viewModel::signOut,
         posts = posts.value,
+        onInfoClick = {
+            // 내 정보 버튼 클릭 시 이메일 다이얼로그 표시
+            showEmailDialog = true
+        },
+        loginEmail = loginEmail
     )
+    if (showEmailDialog) {
+        AlertDialog(
+            onDismissRequest = { showEmailDialog = false },
+            title = { Text(text = "내 정보") },
+            text = { Text(text = "이메일: $loginEmail") },
+            confirmButton = {
+                TextButton(onClick = { showEmailDialog = false }) {
+                    Text("확인")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -97,7 +117,8 @@ private fun MapHomeScreen(
     onWriteClick: () -> Unit,
     onSignOutClick: () -> Unit,
     posts: List<Post>,
-
+    onInfoClick: () -> Unit,
+    loginEmail: String
     ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
@@ -153,13 +174,14 @@ private fun MapHomeScreen(
                         onDismissRequest = { showMenu = false },
                         onInfoClick = {
                             showMenu = false
-                            println("내 정보 눌림") // TODO: 내정보 처리 추가
+                            println("내 정보 눌림")
+                            onInfoClick()// TODO: 내정보 처리 추가
+
                         },
                         onLogoutClick = {
                             showMenu = false
                             onSignOutClick()
 
-                            println("로그아웃 눌림") // TODO: 로그아웃 처리 추가
                         }
                     )
                 }
@@ -209,7 +231,7 @@ private fun ProfileDropdownMenuWrapper(
     ProfileDropdownMenu(
         showMenu = showMenu,
         onDismissRequest = onDismissRequest,
-        onInfoClick = onLogoutClick,
+        onInfoClick = onInfoClick,
         onLogoutClick = onLogoutClick
     )
 }
@@ -227,9 +249,8 @@ fun ProfileDropdownMenu(
     ) {
         DropdownMenuItem(
             text = { Text("내 정보") },
-            onClick = {
+            onClick = onInfoClick
 
-            }
         )
         DropdownMenuItem(
             text = { Text("로그아웃") },
