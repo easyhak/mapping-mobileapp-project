@@ -1,6 +1,8 @@
 package com.trip.myapp.ui.map.home
 
 import android.graphics.Color
+import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,9 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -18,12 +24,17 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +45,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.trip.myapp.R
 import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
@@ -46,13 +58,33 @@ fun MapHomeScreen(
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
     onDetailClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+
     viewModel: MapHomeViewModel = hiltViewModel()
 ) {
     val posts = viewModel.postList.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is MapHomeEvent.SignOUt.Success -> {
+                    onLogoutClick()
+                }
+
+                is MapHomeEvent.SignOUt.Failure -> {
+                    Toast.makeText(context, "로그아웃 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        }
+    }
+
     MapHomeScreen(
         onCommunityClick = onCommunityClick,
         onArchiveClick = onArchiveClick,
         onWriteClick = onWriteClick,
+        onSignOutClick = viewModel::signOut,
         posts = posts.value,
     )
 }
@@ -63,9 +95,12 @@ private fun MapHomeScreen(
     onCommunityClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
+    onSignOutClick: () -> Unit,
     posts: List<Post>,
-) {
+
+    ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
 
     var selectedTabIndex1 = selectedTabIndex
     val navigationItems = listOf(
@@ -97,7 +132,37 @@ private fun MapHomeScreen(
         },
         topBar = {
             TopAppBar(
-                { Text("Mapping") },
+                title = {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_mapping),
+                        contentDescription = "Logo Image"
+                    )
+                    //Text("Mapping")
+                },
+                actions = {
+                    IconButton(onClick = { showMenu = true }) { // 버튼 클릭 시 메뉴 표시
+                        Icon(
+                            imageVector = Icons.Default.Person, // 프로필 아이콘 리소스
+                            contentDescription = "Profile Icon"
+                        )
+                    }
+
+                    // 간단히 호출
+                    ProfileDropdownMenuWrapper(
+                        showMenu = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        onInfoClick = {
+                            showMenu = false
+                            println("내 정보 눌림") // TODO: 내정보 처리 추가
+                        },
+                        onLogoutClick = {
+                            showMenu = false
+                            onSignOutClick()
+
+                            println("로그아웃 눌림") // TODO: 로그아웃 처리 추가
+                        }
+                    )
+                }
             )
         },
         floatingActionButton = {
@@ -134,6 +199,44 @@ private fun MapHomeScreen(
     }
 }
 
+@Composable
+private fun ProfileDropdownMenuWrapper(
+    showMenu: Boolean,
+    onDismissRequest: () -> Unit,
+    onInfoClick: () -> Unit,
+    onLogoutClick: () -> Unit
+) {
+    ProfileDropdownMenu(
+        showMenu = showMenu,
+        onDismissRequest = onDismissRequest,
+        onInfoClick = onLogoutClick,
+        onLogoutClick = onLogoutClick
+    )
+}
+
+@Composable
+fun ProfileDropdownMenu(
+    showMenu: Boolean,
+    onDismissRequest: () -> Unit,
+    onInfoClick: () -> Unit,
+    onLogoutClick: () -> Unit
+) {
+    DropdownMenu(
+        expanded = showMenu,
+        onDismissRequest = onDismissRequest // 메뉴 외부를 클릭하면 닫힘
+    ) {
+        DropdownMenuItem(
+            text = { Text("내 정보") },
+            onClick = {
+
+            }
+        )
+        DropdownMenuItem(
+            text = { Text("로그아웃") },
+            onClick = onLogoutClick
+        )
+    }
+}
 
 @Composable
 private fun MapContent(
@@ -195,7 +298,8 @@ private fun PreviewMapScreen() {
             onCommunityClick = {},
             onArchiveClick = { },
             onWriteClick = { },
-            onDetailClick = { }
+            onDetailClick = { },
+            onLogoutClick = { }
         )
     }
 }

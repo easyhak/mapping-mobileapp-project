@@ -4,7 +4,9 @@ package com.trip.myapp.ui.map.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.trip.myapp.domain.model.Post
+import com.trip.myapp.domain.usecase.AddPostUseCase
 import com.trip.myapp.domain.usecase.FetchPostByUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -17,6 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapHomeViewModel @Inject constructor(
     private val fetchPostByUserIdUseCase: FetchPostByUserIdUseCase,
+    private val addPostUseCase: AddPostUseCase,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _postList = MutableStateFlow<List<Post>>(emptyList())
@@ -45,4 +49,24 @@ class MapHomeViewModel @Inject constructor(
             }
         }
     }
+
+    private val _event = Channel<MapHomeEvent>(64)
+    val event = _event.receiveAsFlow()
+
+    fun signOut() {
+        viewModelScope.launch {
+            try {
+                firebaseAuth.signOut()
+                _event.trySend(MapHomeEvent.SignOUt.Success)
+            } catch (e: Exception) {
+                _event.trySend(MapHomeEvent.SignOUt.Failure)
+            }
+        }
+    }
+
+    val loginEmail = firebaseAuth.currentUser?.email!!
+
+
+
+
 }
