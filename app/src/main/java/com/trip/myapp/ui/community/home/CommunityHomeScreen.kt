@@ -78,7 +78,7 @@ fun CommunityHomeScreen(
             // 내 정보 버튼 클릭 시 이메일 다이얼로그 표시
             showEmailDialog = true
         },
-        loginEmail = loginEmail
+        loginEmail = loginEmail,
         onDetailClick = onDetailClick,
         post = posts
     )
@@ -103,7 +103,7 @@ private fun CommunityHomeScreen(
     onArchiveClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onInfoClick: () -> Unit,
-    loginEmail: String
+    loginEmail: String,
     onDetailClick: (String, String) -> Unit,
     post: LazyPagingItems<Post>
 ) {
@@ -247,8 +247,8 @@ private fun CommunityScreenPreview() {
     CommunityHomeScreen(
         onArchiveClick = {},
         onMapClick = {},
-        onLogoutClick = {}
+        onLogoutClick = {},
         onDetailClick = { _, _ -> },
-        post = flowOf(PagingData.from(listOf(Post()))).collectAsLazyPagingItems()
+        //post = flowOf(PagingData.from(listOf(Post()))).collectAsLazyPagingItems()
     )
 }
