@@ -6,7 +6,7 @@ import com.trip.myapp.domain.model.Archive
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class FetchPagedArchivesUseCase @Inject constructor(
+class FetchPagedArchiveUseCase @Inject constructor(
     private val archiveRepository: ArchiveRepository
 ) {
 

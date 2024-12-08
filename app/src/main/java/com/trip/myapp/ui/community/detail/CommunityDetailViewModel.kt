@@ -5,7 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trip.myapp.domain.model.Post
+import com.trip.myapp.domain.usecase.FetchPagedArchiveUseCase
 import com.trip.myapp.domain.usecase.FetchPostUseCase
+import com.trip.myapp.domain.usecase.ScrapPostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CommunityDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val fetchPostUseCase: FetchPostUseCase
+    private val fetchPostUseCase: FetchPostUseCase,
+    private val fetchPagedArchiveUseCase: FetchPagedArchiveUseCase,
+    private val scrapPostUseCase: ScrapPostUseCase
 ) : ViewModel() {
     private val postId: String? = savedStateHandle.get<String>("postId")
     val postName: String? = savedStateHandle.get<String>("postName")
@@ -43,6 +47,17 @@ class CommunityDetailViewModel @Inject constructor(
                 _isLoading.value = false
             }
 
+        }
+    }
+
+    fun scrapPost(archiveId: String) {
+        viewModelScope.launch {
+            try {
+                postId?.let { scrapPostUseCase(archiveId, it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("CommunityDetailViewModel", "Failed to scrap post", e)
+            }
         }
     }
 }

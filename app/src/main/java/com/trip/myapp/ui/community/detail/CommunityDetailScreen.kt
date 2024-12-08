@@ -191,7 +191,6 @@ fun PostDetailContent(
 @Composable
 private fun Slider(modifier: Modifier = Modifier, images: List<String>) {
 
-
     HorizontalUncontainedCarousel(
         state = rememberCarouselState { images.count() },
         modifier = modifier,
