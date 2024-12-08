@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
@@ -65,7 +68,9 @@ import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.theme.AppTheme
+import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MapHomeScreen(
@@ -171,7 +176,6 @@ private fun MapHomeScreen(
                         painter = painterResource(id = R.drawable.logo_mapping),
                         contentDescription = "Logo Image"
                     )
-                    //Text("Mapping")
                 },
                 actions = {
                     IconButton(onClick = { showMenu = true }) { // 버튼 클릭 시 메뉴 표시
@@ -228,7 +232,11 @@ private fun MapHomeScreen(
                 0 -> MapContent(
                     posts = posts
                 )
-                1 -> CalendarContent()
+
+                1 -> CalendarContent(
+                    // todo 월 별로 가져오기
+                    posts = posts
+                )
             }
         }
 
@@ -276,7 +284,8 @@ private fun ProfileDropdownMenu(
 
 @Composable
 private fun MapContent(
-    posts: List<Post>
+    posts: List<Post>,
+    modifier: Modifier = Modifier
 ) {
     // 대한민국의 중심 좌표 (위도, 경도)
     val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
@@ -287,7 +296,7 @@ private fun MapContent(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
@@ -314,10 +323,10 @@ private fun MapContent(
 }
 
 @Composable
-fun CalendarContent() {
+private fun CalendarContent(posts: List<Post>) {
 
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
-    val today = java.time.LocalDate.now() // 오늘 날짜
+    val today = java.time.LocalDate.now()
 
     val firstDayOfMonth = currentMonth.atDay(1)
     val lastDayOfMonth = currentMonth.atEndOfMonth()
@@ -368,7 +377,7 @@ fun CalendarContent() {
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(vertical = 20.dp),
+            contentPadding = PaddingValues(vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             items(weekDays.size) { index ->
@@ -394,12 +403,28 @@ fun CalendarContent() {
 
             // 날짜 표시
             items(totalDays) { day ->
-                val date = currentMonth.atDay(day + 1) // 현재 날짜 계산
-                val isToday = date == today // 오늘 날짜인지 확인
+                val date = currentMonth.atDay(day + 1)
+                val isToday = date == today
+
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val currentDate = LocalDate.parse(date.toString(), formatter)
+
+                // 해당 날짜에 적용할 색상 (없으면 null)
+                var highlightColor: androidx.compose.ui.graphics.Color? = null
+
+                posts.forEach { post ->
+                    val start = LocalDate.parse(post.startDate, formatter)
+                    val end = LocalDate.parse(post.endDate, formatter)
+
+                    if (!currentDate.isBefore(start) && !currentDate.isAfter(end)) {
+                        // 이 날짜 범위에 해당하는 Post의 pinColor 반영
+                        highlightColor = androidx.compose.ui.graphics.Color(post.pinColor)
+                    }
+                }
 
                 Box(
                     modifier = Modifier
-                        .padding(4.dp)
+                        .clickable { }
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -414,6 +439,17 @@ fun CalendarContent() {
                             MaterialTheme.typography.bodyMedium
                         }
                     )
+
+                    // highlightColor가 null이 아니면 하단에 색칠
+                    highlightColor?.let { color ->
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd) // 상단 오른쪽 끝에 배치
+                                .size(8.dp) // 동그라미 크기
+                                .background(color, shape = CircleShape) // 원형 배경색 설정
+                                .padding(top = 4.dp, end = 4.dp) // 약간의 여백 추가
+                        )
+                    }
                 }
             }
         }
