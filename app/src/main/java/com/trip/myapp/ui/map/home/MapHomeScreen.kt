@@ -166,15 +166,22 @@ private fun MapHomeScreen(
         },
         topBar = {
             TopAppBar(
+                modifier = Modifier.padding(bottom = 8.dp),
                 title = {
                     Image(
                         painter = painterResource(id = R.drawable.logo_mapping),
-                        contentDescription = "Logo Image"
+                        contentDescription = "Logo Image",
+                        modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp)
                     )
                     //Text("Mapping")
                 },
                 actions = {
-                    IconButton(onClick = { showMenu = true }) { // 버튼 클릭 시 메뉴 표시
+                    IconButton(
+                        onClick = { showMenu = true },
+                        modifier = Modifier
+                            .padding(top = 20.dp, end = 16.dp)
+                            .align(Alignment.CenterVertically)
+                    ) { // 버튼 클릭 시 메뉴 표시
                         Icon(
                             imageVector = Icons.Default.Person, // 프로필 아이콘 리소스
                             contentDescription = "Profile Icon"
@@ -189,7 +196,6 @@ private fun MapHomeScreen(
                             showMenu = false
                             println("내 정보 눌림")
                             onInfoClick()// TODO: 내정보 처리 추가
-
                         },
                         onLogoutClick = {
                             showMenu = false
