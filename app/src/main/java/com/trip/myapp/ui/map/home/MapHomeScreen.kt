@@ -1,6 +1,7 @@
 package com.trip.myapp.ui.map.home
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,12 +33,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.trip.myapp.R
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
@@ -50,6 +53,7 @@ fun MapHomeScreen(
     onWriteClick: () -> Unit,
     onDetailClick: () -> Unit,
     onLogoutClick: () -> Unit,
+
     viewModel: MapHomeViewModel = hiltViewModel()
 ) {
 
@@ -74,7 +78,8 @@ fun MapHomeScreen(
         onArchiveClick = onArchiveClick,
         onWriteClick = onWriteClick,
         onSignOutClick = viewModel::signOut,
-    )
+
+        )
 }
 
 @Composable
@@ -84,7 +89,8 @@ private fun MapHomeScreen(
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
     onSignOutClick: () -> Unit,
-) {
+
+    ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
 
@@ -117,7 +123,13 @@ private fun MapHomeScreen(
         },
         topBar = {
             TopAppBar(
-                title = { Text("Mapping") },
+                title = {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_mapping),
+                        contentDescription = "Logo Image"
+                    )
+                    //Text("Mapping")
+                },
                 actions = {
                     IconButton(onClick = { showMenu = true }) { // 버튼 클릭 시 메뉴 표시
                         Icon(

@@ -6,4 +6,6 @@ sealed class MapHomeEvent {
         data object Success : SignOUt()
         data object Failure : SignOUt()
     }
+
+
 }

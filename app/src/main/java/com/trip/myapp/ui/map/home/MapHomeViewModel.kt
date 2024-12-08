@@ -30,4 +30,10 @@ class MapHomeViewModel @Inject constructor(
             }
         }
     }
+
+    val loginEmail = firebaseAuth.currentUser?.email!!
+
+
+
+
 }
