@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -354,7 +355,7 @@ fun CalendarContent() {
             // 다음 달
             IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowForwardIos,
+                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
                     contentDescription = "Next Month"
                 )
             }
@@ -369,7 +370,6 @@ fun CalendarContent() {
             contentPadding = PaddingValues(vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // 요일 표시
             items(weekDays.size) { index ->
                 Box(
                     modifier = Modifier
@@ -380,7 +380,7 @@ fun CalendarContent() {
                     Text(
                         text = weekDays[index],
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold
+                            fontWeight = FontWeight.ExtraBold
                         )
                     )
                 }
@@ -407,7 +407,7 @@ fun CalendarContent() {
                         style = if (isToday) {
                             MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.primary,
-                                fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold
+                                fontWeight = FontWeight.ExtraBold
                             )
                         } else {
                             MaterialTheme.typography.bodyMedium
