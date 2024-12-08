@@ -2,6 +2,7 @@ package com.trip.myapp.ui.map.home
 
 
 import android.graphics.Color
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -109,6 +110,7 @@ fun MapHomeScreen(
         onArchiveClick = onArchiveClick,
         onWriteClick = onWriteClick,
         onSignOutClick = viewModel::signOut,
+        onDetailClick = onDetailClick,
         posts = posts.value,
         onInfoClick = {
             // 내 정보 버튼 클릭 시 이메일 다이얼로그 표시
@@ -136,6 +138,7 @@ private fun MapHomeScreen(
     onCommunityClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     onSignOutClick: () -> Unit,
     posts: List<Post>,
     onInfoClick: () -> Unit,
@@ -144,7 +147,6 @@ private fun MapHomeScreen(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
 
-    var selectedTabIndex1 = selectedTabIndex
     val navigationItems = listOf(
         NavigationItem(
             icon = HomeBottomNavItem.MyDream.icon,
@@ -190,7 +192,7 @@ private fun MapHomeScreen(
                             .align(Alignment.CenterVertically)
                     ) { // 버튼 클릭 시 메뉴 표시
                         Icon(
-                            imageVector = Icons.Default.Person, // 프로필 아이콘 리소스
+                            imageVector = Icons.Default.Person,
                             contentDescription = "Profile Icon"
                         )
                     }
@@ -201,13 +203,11 @@ private fun MapHomeScreen(
                         onDismissRequest = { showMenu = false },
                         onInfoClick = {
                             showMenu = false
-                            println("내 정보 눌림")
                             onInfoClick()// TODO: 내정보 처리 추가
                         },
                         onLogoutClick = {
                             showMenu = false
                             onSignOutClick()
-
                         }
                     )
                 }
@@ -239,12 +239,14 @@ private fun MapHomeScreen(
 
             when (selectedTabIndex) {
                 0 -> MapContent(
-                    posts = posts
+                    posts = posts,
+                    onDetailClick = onDetailClick
                 )
 
                 1 -> CalendarContent(
                     // todo 월 별로 가져오기
-                    posts = posts
+                    posts = posts,
+                    onDetailClick = onDetailClick
                 )
             }
         }
@@ -294,6 +296,7 @@ private fun ProfileDropdownMenu(
 @Composable
 private fun MapContent(
     posts: List<Post>,
+    onDetailClick: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // 대한민국의 중심 좌표 (위도, 경도)
@@ -315,19 +318,25 @@ private fun MapContent(
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,  // 확대/축소 버튼 비 활성화
                 compassEnabled = false,       // 나침반 비 활성화
-                mapToolbarEnabled = false    // 지도 툴바 비 활성화
+                mapToolbarEnabled = false
             )
         ) {
-            posts.forEach {
-                val intColor = it.pinColor.toInt()
+            posts.forEach { post ->
+                val intColor = post.pinColor.toInt()
                 val hsv = FloatArray(3)
                 Color.colorToHSV(intColor, hsv)
                 val hue = hsv[0]
+                Log.d("GoogleMapScreen", post.toString())
                 Marker(
-                    state = MarkerState(position = LatLng(it.latitude, it.longitude)),
-                    title = it.title,
-                    snippet = it.content,
+                    state = MarkerState(position = LatLng(post.latitude, post.longitude)),
+                    title = post.title,
                     icon = BitmapDescriptorFactory.defaultMarker(hue),
+                    onInfoWindowClick = { marker ->
+                        Log.d("MarkerClick", "Clicked Marker: ${marker.title}")
+                        Log.d("MarkerClick", "Clicked Marker ${post}")
+                        onDetailClick(post.id, post.title)
+                        false
+                    },
                     draggable = true
                 )
             }
@@ -338,11 +347,15 @@ private fun MapContent(
 }
 
 @Composable
-private fun CalendarContent(posts: List<Post>) {
+private fun CalendarContent(
+    posts: List<Post>,
+    onDetailClick: (String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
     var selectedPosts by remember { mutableStateOf<List<Post>>(emptyList()) }
-    val today = java.time.LocalDate.now()
+    val today = LocalDate.now()
 
     val firstDayOfMonth = currentMonth.atDay(1)
     val lastDayOfMonth = currentMonth.atEndOfMonth()
@@ -352,7 +365,7 @@ private fun CalendarContent(posts: List<Post>) {
     val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -474,7 +487,7 @@ private fun CalendarContent(posts: List<Post>) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { /* Row 클릭 시 행동 정의 */ }
+                        .clickable { onDetailClick(post.id, post.title) }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
