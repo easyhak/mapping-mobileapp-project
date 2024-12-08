@@ -2,6 +2,7 @@ package com.trip.myapp.ui.archive.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -11,8 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,30 +27,58 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.trip.myapp.R
 import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.theme.AppTheme
+import com.trip.myapp.util.toLazyPagingItems
 
 @Composable
 fun ArchiveDetailScreen(
+    onBackClick: () -> Unit,
     viewModel: ArchiveDetailViewModel = hiltViewModel()
 ) {
+    val pagedPosts = viewModel.pagedPosts.collectAsLazyPagingItems()
+    // 여러개의 post 가 있음
+
+    ArchiveDetailScreen(
+        archiveId = viewModel.archiveId,
+        archiveName = viewModel.archiveName,
+        onBackClick = onBackClick,
+        posts = pagedPosts,
+    )
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchiveDetailScreen(post: Post) {
+private fun ArchiveDetailScreen(
+    archiveId: String?,
+    archiveName: String?,
+    onBackClick: () -> Unit,
+    posts: LazyPagingItems<Post>
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("Detail")
+                    Text(archiveName ?: "찾을 수 없습니다.")
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "뒤로가기"
+                        )
+                    }
                 }
             )
         }
@@ -55,21 +88,27 @@ fun ArchiveDetailScreen(post: Post) {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(
-                count = post.imageUrlList.size,
-                key = { index -> post.imageUrlList[index] }
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index }
             ) { index ->
-                PostCardItem(post = post)
+                val postItem = posts[index]
+                if (postItem != null) {
+                    PostCardItem(
+                        post = postItem,
+                    )
+                }
             }
-
         }
     }
 }
 
 @Composable
-fun PostCardItem(post: Post) {
+private fun PostCardItem(post: Post) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,6 +125,7 @@ fun PostCardItem(post: Post) {
                     .data("https://picsum.photos/200/300")
                     .crossfade(true)
                     .build(),
+                placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = post.title,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,7 +151,34 @@ fun PostCardItem(post: Post) {
 
 @Preview
 @Composable
-fun PreviewArchiveDetailCard() {
+private fun PreviewArchiveDetailScreen() {
+    AppTheme {
+        val dummyPosts = (0..20).map {
+            Post(
+                id = it.toString(),
+                title = "Title",
+                content = "Content",
+                imageUrlList = emptyList(),
+                startDate = "",
+                endDate = "",
+                pinColor = 0,
+                latitude = 0.0,
+                longitude = 0.0,
+                userId = "1"
+            )
+        }.toLazyPagingItems()
+        ArchiveDetailScreen(
+            archiveId = "",
+            archiveName = "테스트",
+            onBackClick = {},
+            posts = dummyPosts
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewArchiveDetailCard() {
     AppTheme {
         PostCardItem(
             post = Post(

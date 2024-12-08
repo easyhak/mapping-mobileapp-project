@@ -2,7 +2,6 @@ package com.trip.myapp.ui.map.write
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trip.myapp.domain.usecase.AddPostUseCase
@@ -36,7 +35,7 @@ class MapWriteViewModel @Inject constructor(
     private val _endDate = MutableStateFlow("")
     val endDate = _endDate.asStateFlow()
 
-    private val _pinColor = MutableStateFlow(Color(0xFF000000))
+    private val _pinColor = MutableStateFlow(Color.Red)
     val pinColor = _pinColor.asStateFlow()
 
     private val _latitude = MutableStateFlow(37.5665)
@@ -92,7 +91,7 @@ class MapWriteViewModel @Inject constructor(
         _selectedImages.value = emptyList()
         _startDate.value = ""
         _endDate.value = ""
-        _pinColor.value = Color(0xFF000000)
+        _pinColor.value = Color.Red
         _latitude.value = 37.5665
         _longitude.value = 126.9780
         _address.value = ""
@@ -101,13 +100,21 @@ class MapWriteViewModel @Inject constructor(
     fun savePost() {
         viewModelScope.launch {
             try {
+                val a = (pinColor.value.alpha * 255).toInt() and 0xFF
+                val r = (pinColor.value.red * 255).toInt() and 0xFF
+                val g = (pinColor.value.green * 255).toInt() and 0xFF
+                val b = (pinColor.value.blue * 255).toInt() and 0xFF
+
+                val intColor = android.graphics.Color.argb(a, r, g, b)
+
+                val longColor = intColor.toLong() and 0xFFFFFFFF
                 addPostUseCase(
                     title = title.value,
                     content = content.value,
                     selectedImages = selectedImages.value,
                     startDate = startDate.value,
                     endDate = endDate.value,
-                    pinColor = pinColor.value.toArgb().toLong(),
+                    pinColor = longColor,
                     latitude = latitude.value,
                     longitude = longitude.value,
                     address = address.value
