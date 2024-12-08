@@ -59,6 +59,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -302,7 +303,12 @@ private fun MapContent(
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,  // 확대/축소 버튼 비 활성화
+                compassEnabled = false,       // 나침반 비 활성화
+                mapToolbarEnabled = false    // 지도 툴바 비 활성화
+            )
         ) {
             posts.forEach {
                 val intColor = it.pinColor.toInt()
@@ -319,6 +325,7 @@ private fun MapContent(
             }
 
         }
+
     }
 }
 
