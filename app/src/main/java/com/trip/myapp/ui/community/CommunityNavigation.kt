@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.trip.myapp.ui.archive.ArchiveGraph
 import com.trip.myapp.ui.community.home.CommunityHomeScreen
+import com.trip.myapp.ui.login.LoginRoute
 import com.trip.myapp.ui.map.MapGraph
 import kotlinx.serialization.Serializable
 
@@ -18,7 +19,6 @@ data object CommunityGraph {
     @Serializable
     data class CommunityDetailRoute(val id: Long)
 }
-
 
 fun NavGraphBuilder.communityGraph(navController: NavController) {
     navigation<CommunityGraph>(
@@ -35,6 +35,13 @@ fun NavGraphBuilder.communityGraph(navController: NavController) {
                 },
                 onMapClick = {
                     navController.navigate(MapGraph, options)
+                },
+                onLogoutClick = {
+                    val logOutOptions = NavOptions.Builder()
+                        .setPopUpTo(CommunityGraph.CommunityHomeRoute, inclusive = true)
+                        .setLaunchSingleTop(true)
+                        .build()
+                    navController.navigate(LoginRoute, navOptions = logOutOptions)
                 }
             )
         }
