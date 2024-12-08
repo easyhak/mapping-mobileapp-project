@@ -11,6 +11,7 @@ data class PostRequest(
     val startDate: String = "",
     val endDate: String = "",
     val userId: String = "",
+    val userName: String = "",
     val userProfileImageUrl: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,

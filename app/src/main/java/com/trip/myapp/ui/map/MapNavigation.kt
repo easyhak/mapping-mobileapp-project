@@ -8,12 +8,16 @@ import androidx.navigation.navigation
 import com.trip.myapp.ui.archive.ArchiveGraph
 import com.trip.myapp.ui.community.CommunityGraph
 import com.trip.myapp.ui.map.home.MapHomeScreen
+import com.trip.myapp.ui.map.write.MapWriteScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object MapGraph {
     @Serializable
     data object MapHomeRoute
+
+    @Serializable
+    data object MapWriteRoute
 
     @Serializable
     data class MapDetailRoute(val id: Long)
@@ -35,7 +39,16 @@ fun NavGraphBuilder.mapGraph(navController: NavController) {
                 onArchiveClick = {
                     navController.navigate(ArchiveGraph, options)
                 },
-                onDetailClick = navController::navigateUp
+                onWriteClick = {
+                    navController.navigate(MapGraph.MapWriteRoute)
+                },
+                onDetailClick = {}
+            )
+        }
+
+        composable<MapGraph.MapWriteRoute> {
+            MapWriteScreen(
+                onBackClick = navController::navigateUp
             )
         }
 

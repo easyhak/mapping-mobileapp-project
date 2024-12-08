@@ -20,10 +20,12 @@ class AddPostUseCase @Inject constructor(
         address: String
     ) {
         val userId = authRepository.getUserUID() ?: throw IllegalStateException("User is not signed in")
+        val userName = authRepository.getUserName() ?: throw IllegalStateException("User is not signed in")
         val userProfileImageUrl = authRepository.getUserPhotoUrl() ?: throw IllegalStateException("User is not signed in")
         postRepository.savePost(
             userId = userId,
             userProfileImageUrl = userProfileImageUrl.toString(),
+            userName = userName,
             title = title,
             content = content,
             imageUrlList = selectedImages,

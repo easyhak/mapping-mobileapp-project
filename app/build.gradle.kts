@@ -123,6 +123,7 @@ dependencies {
     implementation(libs.androidx.paging.compose)
 
     // coil
+    implementation(libs.coil.network.okhttp)
     implementation(libs.coil.compose)
 
     // splash
