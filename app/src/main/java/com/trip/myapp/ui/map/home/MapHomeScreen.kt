@@ -207,7 +207,7 @@ private fun MapHomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onWriteClick,
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
@@ -216,6 +216,7 @@ private fun MapHomeScreen(
         ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             TabRow(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 selectedTabIndex = selectedTabIndex
             ) {
                 tabs.forEachIndexed { index, title ->
@@ -400,7 +401,7 @@ private fun CalendarContent(posts: List<Post>) {
                 Box(modifier = Modifier.height(20.dp)) // 빈 칸
             }
 
-
+            // 날짜 표시
             items(totalDays) { day ->
                 val date = currentMonth.atDay(day + 1)
                 val isToday = date == today
