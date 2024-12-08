@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.trip.myapp.ui.archive.detail.ArchiveDetailScreen
 import com.trip.myapp.ui.archive.home.ArchiveHomeScreen
 import com.trip.myapp.ui.community.CommunityGraph
 import com.trip.myapp.ui.map.MapGraph
@@ -42,6 +43,9 @@ fun NavGraphBuilder.archiveGraph(navController: NavController) {
                     )
                 }
             )
+        }
+        composable<ArchiveGraph.ArchiveDetailRoute> {
+            ArchiveDetailScreen()
         }
     }
 }

@@ -2,6 +2,7 @@ package com.trip.myapp.ui.archive.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -35,6 +36,7 @@ import com.trip.myapp.ui.theme.AppTheme
 fun ArchiveDetailScreen(
     viewModel: ArchiveDetailViewModel = hiltViewModel()
 ) {
+    // 여러개의 post 가 있음
 
 }
 
@@ -55,15 +57,13 @@ fun ArchiveDetailScreen(post: Post) {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(
-                count = post.imageUrlList.size,
-                key = { index -> post.imageUrlList[index] }
-            ) { index ->
+            items(20) { index ->
                 PostCardItem(post = post)
             }
-
         }
     }
 }
@@ -111,7 +111,28 @@ fun PostCardItem(post: Post) {
 
 @Preview
 @Composable
-fun PreviewArchiveDetailCard() {
+private fun PreviewArchiveDetailScreen() {
+    AppTheme {
+        ArchiveDetailScreen(
+            post = Post(
+                id = "1",
+                title = "Title",
+                content = "Content",
+                imageUrlList = listOf("https://picsum.photos/200/300"),
+                startDate = "",
+                endDate = "",
+                pinColor = 0,
+                latitude = 0.0,
+                longitude = 0.0,
+                userId = "1"
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewArchiveDetailCard() {
     AppTheme {
         PostCardItem(
             post = Post(
