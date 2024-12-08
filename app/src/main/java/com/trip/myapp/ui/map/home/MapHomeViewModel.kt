@@ -64,7 +64,7 @@ class MapHomeViewModel @Inject constructor(
         }
     }
 
-    val loginEmail = firebaseAuth.currentUser?.email!!
+    val loginEmail = firebaseAuth.currentUser?.email ?: "No Email"
 
 
 
