@@ -13,20 +13,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,6 +41,10 @@ import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -78,6 +88,8 @@ private fun CommunityDetailScreen(
     isLoading: Boolean,
     postName: String,
 ) {
+
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -90,7 +102,9 @@ private fun CommunityDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        showBottomSheet = true
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.MenuOpen, contentDescription = "scrap")
                     }
                 }
@@ -103,7 +117,7 @@ private fun CommunityDetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                ){
+                ) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -111,6 +125,7 @@ private fun CommunityDetailScreen(
                     )
                 }
             }
+
             else -> {
                 PostDetailContent(
                     post = post,
@@ -120,11 +135,34 @@ private fun CommunityDetailScreen(
                 )
             }
         }
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+            ) {
+                LazyColumn() {
+                    items(25) {
+                        ListItem(
+                            headlineContent = { Text("Three line list item") },
+
+                            trailingContent = {
+                                IconButton(
+                                    onClick = {}
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Add,
+                                        contentDescription = "Localized description",
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PostDetailContent(
@@ -132,58 +170,14 @@ fun PostDetailContent(
     modifier: Modifier = Modifier
 ) {
 
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer // AppBar 배경색 설정
-                ),
-                title = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            post.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        )
-
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* 뒤로가기 동작 */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* 편집하기 동작 */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Comment,
-                            contentDescription = "Edit",
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-        },
-    )
-    { innerPadding ->
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            Slider(modifier = Modifier.padding(innerPadding), post.imageUrlList)
-            Spacer(modifier = Modifier.height(16.dp))
-            ContentSection(post)
-        }
-
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState())
+    ) {
+        Slider(modifier = Modifier, post.imageUrlList)
+        Spacer(modifier = Modifier.height(16.dp))
+        ContentSection(post)
     }
+
 }
 
 
