@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
@@ -28,8 +30,10 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -439,7 +443,7 @@ private fun CalendarContent(
                 ) {
                     Text(
                         text = weekDays[index],
-                        style = MaterialTheme.typography.bodyMedium.copy(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.ExtraBold
                         )
                     )
@@ -474,27 +478,42 @@ private fun CalendarContent(
                 ) {
                     Text(
                         text = (day + 1).toString(),
-                        style = if (isToday) {
-                            MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        } else {
-                            MaterialTheme.typography.bodyMedium
-                        }
+                        style = MaterialTheme.typography.bodyLarge
                     )
 
-                    // 하이라이트 색상 추가
-                    if (postsForDate.isNotEmpty()) {
+                    // 오늘 날짜 원 표시
+                    if (isToday) {
                         Box(
                             modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .size(8.dp)
-                                .background(
-                                    androidx.compose.ui.graphics.Color(postsForDate.first().pinColor),
+                                .size(30.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.primaryContainer,
                                     shape = CircleShape
                                 )
+                                .align(Alignment.Center)
                         )
+                    }
+
+                    // 날짜에 해당하는 Post가 여러 개 있을 경우, 각 Post마다 원을 표시
+                    if (postsForDate.isNotEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            postsForDate.forEachIndexed { index, post ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .background(
+                                            androidx.compose.ui.graphics.Color(post.pinColor),
+                                            shape = CircleShape
+                                        )
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -505,23 +524,36 @@ private fun CalendarContent(
         // 선택된 날짜의 Post 정보 표시
         Column(modifier = Modifier.fillMaxWidth()) {
             selectedPosts.forEach { post ->
-                Row(
+                ElevatedCard(
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onDetailClick(post.id, post.title) }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                        .clickable { onDetailClick(post.id, post.title) },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.PushPin,
-                        contentDescription = "Pin",
-                        tint = androidx.compose.ui.graphics.Color(post.pinColor),
-                        modifier = Modifier.padding(end = 16.dp)
-                    )
-                    Text(
-                        text = post.title,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.PushPin,
+                            contentDescription = "Pin",
+                            tint = androidx.compose.ui.graphics.Color(post.pinColor),
+                            modifier = Modifier.padding(end = 16.dp)
+                        )
+                        Text(
+                            text = post.title,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         }
