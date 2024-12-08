@@ -97,7 +97,8 @@ class PostRepository @Inject constructor(
     // scrap 을 하기
     suspend fun scrapPost(
         userId: String,
-        archiveId: String
+        archiveId: String,
+        postId: String,
     ) {
         // todo
     }
