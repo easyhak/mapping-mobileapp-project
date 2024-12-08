@@ -4,12 +4,22 @@ import android.graphics.Color
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -37,7 +47,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -53,6 +65,7 @@ import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.theme.AppTheme
+import java.time.YearMonth
 
 @Composable
 fun MapHomeScreen(
@@ -119,7 +132,7 @@ private fun MapHomeScreen(
     posts: List<Post>,
     onInfoClick: () -> Unit,
     loginEmail: String
-    ) {
+) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
 
@@ -199,18 +212,18 @@ private fun MapHomeScreen(
         ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             TabRow(
-                selectedTabIndex = selectedTabIndex1
+                selectedTabIndex = selectedTabIndex
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        selected = selectedTabIndex1 == index,
-                        onClick = { selectedTabIndex1 = index },
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
                         text = { Text(title) }
                     )
                 }
             }
 
-            when (selectedTabIndex1) {
+            when (selectedTabIndex) {
                 0 -> MapContent(
                     posts = posts
                 )
@@ -220,6 +233,7 @@ private fun MapHomeScreen(
 
     }
 }
+
 
 @Composable
 private fun ProfileDropdownMenuWrapper(
@@ -300,16 +314,110 @@ private fun MapContent(
 
 @Composable
 fun CalendarContent() {
-    Box(
+
+    var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
+    val today = java.time.LocalDate.now() // 오늘 날짜
+
+    val firstDayOfMonth = currentMonth.atDay(1)
+    val lastDayOfMonth = currentMonth.atEndOfMonth()
+    val totalDays = lastDayOfMonth.dayOfMonth
+    val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
+
+    val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Calendar Content", style = MaterialTheme.typography.titleLarge)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // 저번 달
+            IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBackIosNew,
+                    contentDescription = "Previous Month"
+                )
+            }
+
+            // 현재 월 표시
+            Text(
+                text = "${currentMonth.year}년 ${currentMonth.monthValue}월",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            // 다음 달
+            IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                    contentDescription = "Next Month"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 요일 헤더
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            items(weekDays.size) { index ->
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = weekDays[index],
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
+                }
+            }
+
+            // 빈 칸 처리 (월 시작 전 공백)
+            items(firstDayOfWeek) {
+                Box(modifier = Modifier.height(20.dp)) // 빈 칸
+            }
+
+            // 날짜 표시
+            items(totalDays) { day ->
+                val date = currentMonth.atDay(day + 1) // 현재 날짜 계산
+                val isToday = date == today // 오늘 날짜인지 확인
+
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = (day + 1).toString(),
+                        style = if (isToday) {
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        } else {
+                            MaterialTheme.typography.bodyMedium
+                        }
+                    )
+                }
+            }
+        }
     }
 }
-
 
 @Preview
 @Composable
