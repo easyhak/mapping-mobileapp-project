@@ -27,7 +27,9 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun CommunityHomeScreen(
-    onMapClick: () -> Unit, onArchiveClick: () -> Unit,
+    onMapClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     viewModel: CommunityHomeViewModel = hiltViewModel()
 ) {
 
@@ -35,6 +37,7 @@ fun CommunityHomeScreen(
     CommunityHomeScreen(
         onMapClick = onMapClick,
         onArchiveClick = onArchiveClick,
+        onDetailClick = onDetailClick,
         post = posts
     )
 
@@ -45,6 +48,7 @@ fun CommunityHomeScreen(
 private fun CommunityHomeScreen(
     onMapClick: () -> Unit,
     onArchiveClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     post: LazyPagingItems<Post>
 ) {
     val navigationItems = listOf(
@@ -86,7 +90,7 @@ private fun CommunityHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
 
-        ) {
+            ) {
             items(
                 count = post.itemCount,
                 key = { index -> post[index]?.id ?: index }
@@ -95,6 +99,7 @@ private fun CommunityHomeScreen(
                 if (postItem != null) {
                     CommunityPostCard(
                         post = postItem,
+                        onDetailClick = onDetailClick
                     )
                 }
             }
@@ -109,6 +114,7 @@ private fun CommunityScreenPreview() {
     CommunityHomeScreen(
         onArchiveClick = {},
         onMapClick = {},
+        onDetailClick = { _, _ -> },
         post = flowOf(PagingData.from(listOf(Post()))).collectAsLazyPagingItems()
     )
 }
