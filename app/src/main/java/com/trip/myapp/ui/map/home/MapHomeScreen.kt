@@ -1,5 +1,6 @@
 package com.trip.myapp.ui.map.home
 
+import android.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,10 +26,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
@@ -42,10 +48,12 @@ fun MapHomeScreen(
     onDetailClick: () -> Unit,
     viewModel: MapHomeViewModel = hiltViewModel()
 ) {
+    val posts = viewModel.postList.collectAsStateWithLifecycle()
     MapHomeScreen(
         onCommunityClick = onCommunityClick,
         onArchiveClick = onArchiveClick,
         onWriteClick = onWriteClick,
+        posts = posts.value,
     )
 }
 
@@ -54,7 +62,8 @@ fun MapHomeScreen(
 private fun MapHomeScreen(
     onCommunityClick: () -> Unit,
     onArchiveClick: () -> Unit,
-    onWriteClick: () -> Unit
+    onWriteClick: () -> Unit,
+    posts: List<Post>,
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -115,7 +124,9 @@ private fun MapHomeScreen(
             }
 
             when (selectedTabIndex1) {
-                0 -> MapContent()
+                0 -> MapContent(
+                    posts = posts
+                )
                 1 -> CalendarContent()
             }
         }
@@ -125,7 +136,9 @@ private fun MapHomeScreen(
 
 
 @Composable
-fun MapContent() {
+private fun MapContent(
+    posts: List<Post>
+) {
     // 대한민국의 중심 좌표 (위도, 경도)
     val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
 
@@ -143,7 +156,19 @@ fun MapContent() {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
         ) {
-            // 지도에 마커 추가
+            posts.forEach {
+                val intColor = it.pinColor.toInt()
+                val hsv = FloatArray(3)
+                Color.colorToHSV(intColor, hsv)
+                val hue = hsv[0]
+                Marker(
+                    state = MarkerState(position = LatLng(it.latitude, it.longitude)),
+                    title = it.title,
+                    snippet = it.content,
+                    icon = BitmapDescriptorFactory.defaultMarker(hue),
+                    draggable = true
+                )
+            }
 
         }
     }

@@ -38,6 +38,19 @@ class ArchiveRepository @Inject constructor(
         }
     }
 
+    suspend fun fetchArchive(
+        userId: String,
+        archiveId: String,
+    ): Archive {
+        val archiveRef = userCollection.document(userId).collection("archives").document(archiveId)
+
+        return try {
+            val snapshot = archiveRef.get().await()
+            snapshot.toObject(Archive::class.java)!!
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 
     fun fetchPagedArchives(
         userId: String,

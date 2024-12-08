@@ -17,10 +17,7 @@ import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
-import com.trip.myapp.ui.archive.detail.PostCardItem
-import com.trip.myapp.ui.archive.home.CardItem
 import com.trip.myapp.ui.archive.home.component.CommunityPostCard
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 @Composable

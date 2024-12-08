@@ -56,7 +56,7 @@ import com.trip.myapp.ui.NavigationItem
 fun ArchiveHomeScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
-    onDetailClick: (String) -> Unit,
+    onDetailClick: (String, String) -> Unit,
     viewModel: ArchiveHomeViewModel = hiltViewModel()
 ) {
     val pagedArchives = viewModel.pagedArchives.collectAsLazyPagingItems()
@@ -90,7 +90,7 @@ fun ArchiveHomeScreen(
 fun ArchiveHomeScreen(
     onCommunityClick: () -> Unit,
     onMapClick: () -> Unit,
-    onDetailClick: (String) -> Unit,
+    onDetailClick: (String, String) -> Unit,
     archives: LazyPagingItems<Archive>,
     addArchive: (String) -> Unit
 ) {
@@ -146,14 +146,23 @@ fun ArchiveHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            item {
+                ArchiveCardItem(
+                    archive = Archive(
+                        name = "전체"
+                    ),
+                    onDetailClick = onDetailClick,
+                )
+            }
             items(
                 count = archives.itemCount,
                 key = { index -> archives[index]?.id ?: index }
             ) { index ->
                 val archive = archives[index]
                 if (archive != null) {
-                    CardItem(
+                    ArchiveCardItem(
                         archive = archive,
+                        onDetailClick = onDetailClick,
                     )
                 }
             }
@@ -169,11 +178,17 @@ fun ArchiveHomeScreen(
 }
 
 @Composable
-fun CardItem(archive: Archive, modifier: Modifier = Modifier) {
+fun ArchiveCardItem(
+    archive: Archive,
+    onDetailClick: (String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable {
+                onDetailClick(archive.id, archive.name)
+            }
             .aspectRatio(1f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.primary)
@@ -252,6 +267,8 @@ private fun PreviewArchiveScreen() {
     ArchiveHomeScreen(
         onCommunityClick = {},
         onMapClick = {},
-        onDetailClick = {}
+        onDetailClick = { _, _ ->
+            {}
+        }
     )
 }
