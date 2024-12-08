@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
@@ -28,8 +29,10 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -505,23 +508,36 @@ private fun CalendarContent(
         // 선택된 날짜의 Post 정보 표시
         Column(modifier = Modifier.fillMaxWidth()) {
             selectedPosts.forEach { post ->
-                Row(
+                ElevatedCard(
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onDetailClick(post.id, post.title) }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                        .clickable { onDetailClick(post.id, post.title) },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.PushPin,
-                        contentDescription = "Pin",
-                        tint = androidx.compose.ui.graphics.Color(post.pinColor),
-                        modifier = Modifier.padding(end = 16.dp)
-                    )
-                    Text(
-                        text = post.title,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.PushPin,
+                            contentDescription = "Pin",
+                            tint = androidx.compose.ui.graphics.Color(post.pinColor),
+                            modifier = Modifier.padding(end = 16.dp)
+                        )
+                        Text(
+                            text = post.title,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         }
