@@ -26,6 +26,7 @@ android {
         getByName("debug") {
             val keystoreProperties = loadProperties("local.properties")
             val keyStorePath = keystoreProperties.getProperty("DEBUG_KEYSTORE_PATH")
+
             storeFile = if (keyStorePath != null) {
                 file(keyStorePath)
             } else {

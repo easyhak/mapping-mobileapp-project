@@ -17,7 +17,10 @@ data object ArchiveGraph {
     data object ArchiveHomeRoute
 
     @Serializable
-    data class ArchiveDetailRoute(val archiveId: String)
+    data class ArchiveDetailRoute(
+        val archiveId: String,
+        val archiveName: String,
+    )
 }
 
 fun NavGraphBuilder.archiveGraph(navController: NavController) {
@@ -37,15 +40,20 @@ fun NavGraphBuilder.archiveGraph(navController: NavController) {
                 onMapClick = {
                     navController.navigate(MapGraph, options)
                 },
-                onDetailClick = { archiveId ->
+                onDetailClick = { archiveId, archiveName ->
                     navController.navigate(
-                        route = ArchiveGraph.ArchiveDetailRoute(archiveId)
+                        route = ArchiveGraph.ArchiveDetailRoute(
+                            archiveId = archiveId,
+                            archiveName = archiveName
+                        )
                     )
                 }
             )
         }
         composable<ArchiveGraph.ArchiveDetailRoute> {
-            ArchiveDetailScreen()
+            ArchiveDetailScreen(
+                onBackClick = navController::navigateUp
+            )
         }
     }
 }

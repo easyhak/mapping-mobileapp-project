@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,23 +43,42 @@ import com.trip.myapp.util.toLazyPagingItems
 
 @Composable
 fun ArchiveDetailScreen(
+    onBackClick: () -> Unit,
     viewModel: ArchiveDetailViewModel = hiltViewModel()
 ) {
     val pagedPosts = viewModel.pagedPosts.collectAsLazyPagingItems()
     // 여러개의 post 가 있음
 
+    ArchiveDetailScreen(
+        archiveId = viewModel.archiveId,
+        archiveName = viewModel.archiveName,
+        onBackClick = onBackClick,
+        posts = pagedPosts,
+    )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchiveDetailScreen(
+private fun ArchiveDetailScreen(
+    archiveId: String?,
+    archiveName: String?,
+    onBackClick: () -> Unit,
     posts: LazyPagingItems<Post>
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("Detail")
+                    Text(archiveName ?: "찾을 수 없습니다.")
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "뒤로가기"
+                        )
+                    }
                 }
             )
         }
@@ -145,8 +168,9 @@ private fun PreviewArchiveDetailScreen() {
             )
         }.toLazyPagingItems()
         ArchiveDetailScreen(
-
-            // 20개 보여주기
+            archiveId = "",
+            archiveName = "테스트",
+            onBackClick = {},
             posts = dummyPosts
         )
     }

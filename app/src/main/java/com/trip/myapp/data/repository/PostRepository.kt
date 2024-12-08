@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.trip.myapp.data.dto.PostPagingSource
 import com.trip.myapp.data.dto.PostRequest
@@ -115,5 +116,18 @@ class PostRepository @Inject constructor(
                 )
             }
         ).flow
+    }
+
+    suspend fun fetchPostsByUserId(userId: String): List<Post> {
+        return try {
+            val snapshot: QuerySnapshot = postCollection
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+            snapshot.toObjects(Post::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList() // 에러 발생 시 빈 리스트 반환
+        }
     }
 }
