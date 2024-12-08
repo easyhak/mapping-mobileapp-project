@@ -7,11 +7,14 @@ import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.trip.myapp.R
 
 data class NavigationItem(
@@ -23,7 +26,12 @@ data class NavigationItem(
 
 @Composable
 fun HomeBottomNavigation(items: List<NavigationItem>) {
-    BottomAppBar {
+    BottomAppBar(
+        tonalElevation = 10.dp,
+        containerColor = Color.White,  // 배경 색상
+        contentColor = MaterialTheme.colorScheme.primary   // 아이콘 및 텍스트 색상
+    ) {
+
         items.forEach { item ->
             NavigationBarItem(
                 icon = {

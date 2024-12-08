@@ -38,6 +38,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -151,12 +152,18 @@ private fun MapWriteScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+
                 title = { Text(text = "여행 기록하기") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로가기")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer, // 앱바의 배경색
+                    titleContentColor = MaterialTheme.colorScheme.primary, // 제목 텍스트 색상
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary  // 네비게이션 아이콘(뒤로가기) 색상
+                )
             )
         },
 
@@ -225,7 +232,7 @@ private fun MapWriteScreen(
                     modifier = Modifier
                         .padding(vertical = 16.dp, horizontal = 20.dp)
                         .size(width = 250.dp, height = 50.dp),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
                 ) {
                     Text(text = "기록 완료")
                 }

@@ -203,7 +203,7 @@ private fun MapHomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onWriteClick,
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
@@ -212,6 +212,7 @@ private fun MapHomeScreen(
         ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             TabRow(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 selectedTabIndex = selectedTabIndex
             ) {
                 tabs.forEachIndexed { index, title ->
