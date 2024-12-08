@@ -40,10 +40,11 @@ fun CommunityPostCard(
             Icon(
                 imageVector = Icons.Default.PhotoLibrary,
                 contentDescription = "Multiple Photos Icon",
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(8.dp) // 약간의 패딩 추가
+                    .padding(8.dp)
+
             )
         }
     }
