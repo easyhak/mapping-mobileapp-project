@@ -222,7 +222,7 @@ private fun MapHomeScreen(
                 }
             }
 
-            when (selectedTabIndex1) {
+            when (selectedTabIndex) {
                 0 -> MapContent(
                     posts = posts
                 )
