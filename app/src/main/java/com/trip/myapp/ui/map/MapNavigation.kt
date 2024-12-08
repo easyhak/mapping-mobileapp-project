@@ -44,7 +44,7 @@ fun NavGraphBuilder.mapGraph(navController: NavController) {
                     navController.navigate(MapGraph.MapWriteRoute)
                 },
                 onDetailClick = { postId, postName ->
-                    navController.navigate(CommunityGraph.CommunityDetailRoute)
+                    navController.navigate(CommunityGraph.CommunityDetailRoute(postId, postName))
                 },
                 onLogoutClick = {
                     val logOutOptions = NavOptions.Builder()

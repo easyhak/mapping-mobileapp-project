@@ -109,6 +109,7 @@ fun MapHomeScreen(
         onArchiveClick = onArchiveClick,
         onWriteClick = onWriteClick,
         onSignOutClick = viewModel::signOut,
+        onDetailClick = onDetailClick,
         posts = posts.value,
         onInfoClick = {
             // 내 정보 버튼 클릭 시 이메일 다이얼로그 표시
@@ -136,6 +137,7 @@ private fun MapHomeScreen(
     onCommunityClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     onSignOutClick: () -> Unit,
     posts: List<Post>,
     onInfoClick: () -> Unit,
@@ -238,7 +240,8 @@ private fun MapHomeScreen(
 
                 1 -> CalendarContent(
                     // todo 월 별로 가져오기
-                    posts = posts
+                    posts = posts,
+                    onDetailClick = onDetailClick
                 )
             }
         }
@@ -332,11 +335,15 @@ private fun MapContent(
 }
 
 @Composable
-private fun CalendarContent(posts: List<Post>) {
+private fun CalendarContent(
+    posts: List<Post>,
+    onDetailClick: (String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
     var selectedPosts by remember { mutableStateOf<List<Post>>(emptyList()) }
-    val today = java.time.LocalDate.now()
+    val today = LocalDate.now()
 
     val firstDayOfMonth = currentMonth.atDay(1)
     val lastDayOfMonth = currentMonth.atEndOfMonth()
@@ -346,7 +353,7 @@ private fun CalendarContent(posts: List<Post>) {
     val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -468,7 +475,7 @@ private fun CalendarContent(posts: List<Post>) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { /* Row 클릭 시 행동 정의 */ }
+                        .clickable { onDetailClick(post.id, post.title) }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
