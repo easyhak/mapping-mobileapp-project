@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -27,6 +28,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -71,51 +74,69 @@ fun MapWriteScreen(
     onBackClick: () -> Unit,
     viewModel: MapWriteViewModel = hiltViewModel()
 ) {
-    val title = viewModel.title.collectAsStateWithLifecycle()
-    val content = viewModel.content.collectAsStateWithLifecycle()
-    val selectedImages = viewModel.selectedImages.collectAsStateWithLifecycle()
-    val startDate = viewModel.startDate.collectAsStateWithLifecycle()
-    val endDate = viewModel.endDate.collectAsStateWithLifecycle()
-    val pinColor = viewModel.pinColor.collectAsStateWithLifecycle()
-    val latitude = viewModel.latitude.collectAsStateWithLifecycle()
-    val longitude = viewModel.longitude.collectAsStateWithLifecycle()
-    val address = viewModel.address.collectAsStateWithLifecycle()
+    val title by viewModel.title.collectAsStateWithLifecycle()
+    val content by viewModel.content.collectAsStateWithLifecycle()
+    val selectedImages by viewModel.selectedImages.collectAsStateWithLifecycle()
+    val startDate by viewModel.startDate.collectAsStateWithLifecycle()
+    val endDate by viewModel.endDate.collectAsStateWithLifecycle()
+    val pinColor by viewModel.pinColor.collectAsStateWithLifecycle()
+    val latitude by viewModel.latitude.collectAsStateWithLifecycle()
+    val longitude by viewModel.longitude.collectAsStateWithLifecycle()
+    val address by viewModel.address.collectAsStateWithLifecycle()
 
     // 성공했을 때 event 처리하기
+    var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
                 is MapWriteEvent.AddPost.Success -> {
                     onBackClick()
+                    isLoading = false
                 }
 
                 is MapWriteEvent.AddPost.Failure -> {
                     Toast.makeText(context, "업로드 실패", Toast.LENGTH_SHORT).show()
+                    isLoading = false
                 }
 
-                MapWriteEvent.AddPost.Loading -> {}
+                MapWriteEvent.AddPost.Loading -> {
+                    isLoading = true
+                }
             }
         }
     }
 
+    if (isLoading) {
+        Dialog(onDismissRequest = {}) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
 
     MapWriteScreen(
-        title = title.value,
-        content = content.value,
+        title = title,
+        content = content,
         onTitleChange = viewModel::updateTitle,
         onContentChange = viewModel::updateContent,
-        selectedImages = selectedImages.value,
+        selectedImages = selectedImages,
         onImagesChange = viewModel::addSelectedImages,
-        startDate = startDate.value,
-        endDate = endDate.value,
+        startDate = startDate,
+        endDate = endDate,
         onStartDateChange = viewModel::updateStartDate,
         onEndDateChange = viewModel::updateEndDate,
-        pinColor = pinColor.value,
+        pinColor = pinColor,
         onPinColorChange = viewModel::updatePinColor,
-        latitude = latitude.value,
-        longitude = longitude.value,
-        address = address.value,
+        latitude = latitude,
+        longitude = longitude,
+        address = address,
         onLatitudeChange = viewModel::updateLatitude,
         onLongitudeChange = viewModel::updateLongitude,
         onAddressChange = viewModel::updateAddress,

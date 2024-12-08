@@ -108,6 +108,7 @@ class MapWriteViewModel @Inject constructor(
                 val intColor = android.graphics.Color.argb(a, r, g, b)
 
                 val longColor = intColor.toLong() and 0xFFFFFFFF
+                _event.trySend(MapWriteEvent.AddPost.Loading)
                 addPostUseCase(
                     title = title.value,
                     content = content.value,
