@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -477,15 +478,22 @@ private fun CalendarContent(
                 ) {
                     Text(
                         text = (day + 1).toString(),
-                        style = if (isToday) {
-                            MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        } else {
-                            MaterialTheme.typography.bodyLarge
-                        }
+                        style = MaterialTheme.typography.bodyLarge
                     )
+
+                    // 오늘 날짜 원 표시
+                    if (isToday) {
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = CircleShape
+                                )
+                                .align(Alignment.Center)
+                        )
+                    }
 
                     // 날짜에 해당하는 Post가 여러 개 있을 경우, 각 Post마다 원을 표시
                     if (postsForDate.isNotEmpty()) {
