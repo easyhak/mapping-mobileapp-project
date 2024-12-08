@@ -19,9 +19,6 @@ data object MapGraph {
 
     @Serializable
     data object MapWriteRoute
-
-    @Serializable
-    data class MapDetailRoute(val id: Long)
 }
 
 fun NavGraphBuilder.mapGraph(navController: NavController) {

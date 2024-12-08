@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.trip.myapp.ui.community.CommunityGraph
+import com.trip.myapp.ui.map.MapGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +18,7 @@ fun NavGraphBuilder.loginScreen(navController: NavController) {
                     .setPopUpTo(LoginRoute, inclusive = true)
                     .setLaunchSingleTop(true)
                     .build()
-                navController.navigate(CommunityGraph, options)
+                navController.navigate(MapGraph, options)
             }
         )
     }
