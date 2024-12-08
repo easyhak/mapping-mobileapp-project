@@ -491,12 +491,12 @@ private fun CalendarContent(
                     if (postsForDate.isNotEmpty()) {
                         Box(
                             modifier = Modifier
-                                .align(Alignment.TopEnd)
                                 .size(8.dp)
                                 .background(
                                     androidx.compose.ui.graphics.Color(postsForDate.first().pinColor),
                                     shape = CircleShape
                                 )
+                                .align(Alignment.CenterEnd)
                         )
                     }
                 }
