@@ -23,26 +23,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.trip.myapp.R
 import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.theme.AppTheme
+import com.trip.myapp.util.toLazyPagingItems
 
 @Composable
 fun ArchiveDetailScreen(
     viewModel: ArchiveDetailViewModel = hiltViewModel()
 ) {
+    val pagedPosts = viewModel.pagedPosts.collectAsLazyPagingItems()
     // 여러개의 post 가 있음
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchiveDetailScreen(post: Post) {
+fun ArchiveDetailScreen(
+    posts: LazyPagingItems<Post>
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -61,15 +69,23 @@ fun ArchiveDetailScreen(post: Post) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(20) { index ->
-                PostCardItem(post = post)
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index }
+            ) { index ->
+                val postItem = posts[index]
+                if (postItem != null) {
+                    PostCardItem(
+                        post = postItem,
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun PostCardItem(post: Post) {
+private fun PostCardItem(post: Post) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,6 +102,7 @@ fun PostCardItem(post: Post) {
                     .data("https://picsum.photos/200/300")
                     .crossfade(true)
                     .build(),
+                placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = post.title,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,12 +130,12 @@ fun PostCardItem(post: Post) {
 @Composable
 private fun PreviewArchiveDetailScreen() {
     AppTheme {
-        ArchiveDetailScreen(
-            post = Post(
-                id = "1",
+        val dummyPosts = (0..20).map {
+            Post(
+                id = it.toString(),
                 title = "Title",
                 content = "Content",
-                imageUrlList = listOf("https://picsum.photos/200/300"),
+                imageUrlList = emptyList(),
                 startDate = "",
                 endDate = "",
                 pinColor = 0,
@@ -126,6 +143,11 @@ private fun PreviewArchiveDetailScreen() {
                 longitude = 0.0,
                 userId = "1"
             )
+        }.toLazyPagingItems()
+        ArchiveDetailScreen(
+
+            // 20개 보여주기
+            posts = dummyPosts
         )
     }
 }

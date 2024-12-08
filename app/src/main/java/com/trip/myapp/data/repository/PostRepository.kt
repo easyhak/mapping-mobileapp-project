@@ -107,7 +107,7 @@ class PostRepository @Inject constructor(
         archiveId: String
     ): Flow<PagingData<Post>> {
         return Pager(
-            config = PagingConfig(pageSize = 10),
+            config = PagingConfig(pageSize = 30),
             pagingSourceFactory = {
                 PostPagingSource(
                     postCollection = userCollection.document(userId).collection("archives")
