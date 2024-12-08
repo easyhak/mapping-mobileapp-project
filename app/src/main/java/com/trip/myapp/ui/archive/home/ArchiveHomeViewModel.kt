@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.google.firebase.auth.FirebaseAuth
 import com.trip.myapp.data.repository.AuthRepository
 import com.trip.myapp.domain.model.Archive
 import com.trip.myapp.domain.usecase.AddArchiveUseCase
@@ -22,6 +23,7 @@ class ArchiveHomeViewModel @Inject constructor(
     private val fetchPagedArchivesUseCase: FetchPagedArchivesUseCase,
     private val addArchiveUseCase: AddArchiveUseCase,
     private val authRepository: AuthRepository,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _event = Channel<ArchiveHomeEvent>(64)
@@ -46,4 +48,17 @@ class ArchiveHomeViewModel @Inject constructor(
 
         }
     }
+
+    fun signOut() {
+        viewModelScope.launch {
+            try {
+                firebaseAuth.signOut()
+                _event.trySend(ArchiveHomeEvent.SignOUt.Success)
+            } catch (e: Exception) {
+                _event.trySend(ArchiveHomeEvent.SignOUt.Failure)
+            }
+        }
+    }
+
+    val loginEmail = firebaseAuth.currentUser?.email ?: "No Email"
 }
