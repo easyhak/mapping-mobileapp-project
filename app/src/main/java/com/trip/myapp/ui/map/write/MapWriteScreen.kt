@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -291,17 +293,10 @@ private fun PickingPhoto(
     selectedImages: List<String>,
     onImagesChange: (List<String>) -> Unit
 ) {
-    val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments(),
         onResult = { uris ->
-//            val names = uris.mapNotNull { uri ->
-//                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-//                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-//                    cursor.moveToFirst()
-//                    if (nameIndex != -1) cursor.getString(nameIndex) else null
-//                }
-//            }
+
             val names = uris.map { it.toString() }
             // 선택된 이미지 목록 업데이트
             onImagesChange(names)
@@ -599,15 +594,25 @@ private fun PickingLocation(
                 ) // 클릭 시 카메라 위치 갱신
             }
         ) {
+            val a = (pinColor.alpha * 255).toInt() and 0xFF
+            val r = (pinColor.red * 255).toInt() and 0xFF
+            val g = (pinColor.green * 255).toInt() and 0xFF
+            val b = (pinColor.blue * 255).toInt() and 0xFF
+
+            val intColor = android.graphics.Color.argb(a, r, g, b)
+
+            val hsv = FloatArray(3)
+            android.graphics.Color.colorToHSV(intColor, hsv)
+            val hue = hsv[0]
             Marker(
                 state = MarkerState(
                     position = LatLng(
                         latitude,
                         longitude
                     )
-                ), // 뷰모델에서 관리하는 latitude, longitude 사용
+                ),
                 /* Todo 아이콘 모양 변경하기 */
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
+                icon = BitmapDescriptorFactory.defaultMarker(hue),
                 title = "선택한 위치"
             )
         }
@@ -651,20 +656,31 @@ private fun MapDialog(
 @Composable
 private fun ColorPickerDialog(
     onColorSelected: (Color) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     // 색상 선택 다이얼로그
     Column(
         modifier = Modifier
             .fillMaxWidth()
-
             .padding(16.dp)
     ) {
         Text("색을 선택하세요", style = MaterialTheme.typography.bodyLarge)
 
         // 색상 옵션들
-        Row(modifier = Modifier.padding(top = 16.dp)) {
-            val colors = listOf(Color.Red, Color.Blue, Color.Green, Color.Black)
+        Row(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .horizontalScroll(rememberScrollState())
+        ) {
+            val colors =
+                listOf(
+                    Color.Red,
+                    Color.Blue,
+                    Color.Magenta,
+                    Color.Yellow,
+                    Color.Green,
+                )
             colors.forEach { color ->
                 Box(
                     modifier = Modifier

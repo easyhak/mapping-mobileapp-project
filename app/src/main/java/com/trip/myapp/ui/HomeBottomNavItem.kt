@@ -2,9 +2,9 @@ package com.trip.myapp.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Comment
-import androidx.compose.material.icons.outlined.Hotel
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.CollectionsBookmark
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -46,17 +46,17 @@ sealed class HomeBottomNavItem(
     @StringRes val label: Int,
 ) {
     data object MyDream : HomeBottomNavItem(
-        icon = Icons.Outlined.Hotel,
+        icon = Icons.Outlined.Group,
         label = R.string.icon_text_community,
     )
 
     data object Community : HomeBottomNavItem(
-        icon = Icons.AutoMirrored.Outlined.Comment,
+        icon = Icons.Outlined.LocationOn,
         label = R.string.icon_text_map,
     )
 
     data object Setting : HomeBottomNavItem(
-        icon = Icons.Outlined.Settings,
+        icon = Icons.Outlined.CollectionsBookmark,
         label = R.string.icon_text_archive,
     )
 }

@@ -1,5 +1,6 @@
 package com.trip.myapp.ui.map.home
 
+import android.graphics.Color
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,11 +37,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.trip.myapp.R
+import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
@@ -56,6 +62,7 @@ fun MapHomeScreen(
 
     viewModel: MapHomeViewModel = hiltViewModel()
 ) {
+    val posts = viewModel.postList.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -78,8 +85,8 @@ fun MapHomeScreen(
         onArchiveClick = onArchiveClick,
         onWriteClick = onWriteClick,
         onSignOutClick = viewModel::signOut,
-
-        )
+        posts = posts.value,
+    )
 }
 
 @Composable
@@ -89,11 +96,13 @@ private fun MapHomeScreen(
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
     onSignOutClick: () -> Unit,
+    posts: List<Post>,
 
     ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
 
+    var selectedTabIndex1 = selectedTabIndex
     val navigationItems = listOf(
         NavigationItem(
             icon = HomeBottomNavItem.MyDream.icon,
@@ -164,30 +173,34 @@ private fun MapHomeScreen(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         },
-    ) { innerPadding ->
+
+        ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             TabRow(
-                selectedTabIndex = selectedTabIndex
+                selectedTabIndex = selectedTabIndex1
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                        selected = selectedTabIndex1 == index,
+                        onClick = { selectedTabIndex1 = index },
                         text = { Text(title) }
                     )
                 }
             }
 
-            when (selectedTabIndex) {
-                0 -> MapContent()
+            when (selectedTabIndex1) {
+                0 -> MapContent(
+                    posts = posts
+                )
                 1 -> CalendarContent()
             }
         }
+
     }
 }
 
 @Composable
-fun ProfileDropdownMenuWrapper(
+private fun ProfileDropdownMenuWrapper(
     showMenu: Boolean,
     onDismissRequest: () -> Unit,
     onInfoClick: () -> Unit,
@@ -226,7 +239,9 @@ fun ProfileDropdownMenu(
 }
 
 @Composable
-fun MapContent() {
+private fun MapContent(
+    posts: List<Post>
+) {
     // 대한민국의 중심 좌표 (위도, 경도)
     val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
 
@@ -244,7 +259,19 @@ fun MapContent() {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
         ) {
-            // 지도에 마커 추가
+            posts.forEach {
+                val intColor = it.pinColor.toInt()
+                val hsv = FloatArray(3)
+                Color.colorToHSV(intColor, hsv)
+                val hue = hsv[0]
+                Marker(
+                    state = MarkerState(position = LatLng(it.latitude, it.longitude)),
+                    title = it.title,
+                    snippet = it.content,
+                    icon = BitmapDescriptorFactory.defaultMarker(hue),
+                    draggable = true
+                )
+            }
 
         }
     }
