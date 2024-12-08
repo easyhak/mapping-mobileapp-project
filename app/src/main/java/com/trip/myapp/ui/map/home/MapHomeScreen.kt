@@ -2,6 +2,7 @@ package com.trip.myapp.ui.map.home
 
 
 import android.graphics.Color
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -146,7 +147,6 @@ private fun MapHomeScreen(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) } // 메뉴 표시 상태 추가
 
-    var selectedTabIndex1 = selectedTabIndex
     val navigationItems = listOf(
         NavigationItem(
             icon = HomeBottomNavItem.MyDream.icon,
@@ -185,7 +185,7 @@ private fun MapHomeScreen(
                 actions = {
                     IconButton(onClick = { showMenu = true }) { // 버튼 클릭 시 메뉴 표시
                         Icon(
-                            imageVector = Icons.Default.Person, // 프로필 아이콘 리소스
+                            imageVector = Icons.Default.Person,
                             contentDescription = "Profile Icon"
                         )
                     }
@@ -196,14 +196,12 @@ private fun MapHomeScreen(
                         onDismissRequest = { showMenu = false },
                         onInfoClick = {
                             showMenu = false
-                            println("내 정보 눌림")
                             onInfoClick()// TODO: 내정보 처리 추가
 
                         },
                         onLogoutClick = {
                             showMenu = false
                             onSignOutClick()
-
                         }
                     )
                 }
@@ -235,7 +233,8 @@ private fun MapHomeScreen(
 
             when (selectedTabIndex) {
                 0 -> MapContent(
-                    posts = posts
+                    posts = posts,
+                    onDetailClick = onDetailClick
                 )
 
                 1 -> CalendarContent(
@@ -291,6 +290,7 @@ private fun ProfileDropdownMenu(
 @Composable
 private fun MapContent(
     posts: List<Post>,
+    onDetailClick: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // 대한민국의 중심 좌표 (위도, 경도)
@@ -312,19 +312,25 @@ private fun MapContent(
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,  // 확대/축소 버튼 비 활성화
                 compassEnabled = false,       // 나침반 비 활성화
-                mapToolbarEnabled = false    // 지도 툴바 비 활성화
+                mapToolbarEnabled = false
             )
         ) {
-            posts.forEach {
-                val intColor = it.pinColor.toInt()
+            posts.forEach { post ->
+                val intColor = post.pinColor.toInt()
                 val hsv = FloatArray(3)
                 Color.colorToHSV(intColor, hsv)
                 val hue = hsv[0]
+                Log.d("GoogleMapScreen", post.toString())
                 Marker(
-                    state = MarkerState(position = LatLng(it.latitude, it.longitude)),
-                    title = it.title,
-                    snippet = it.content,
+                    state = MarkerState(position = LatLng(post.latitude, post.longitude)),
+                    title = post.title,
                     icon = BitmapDescriptorFactory.defaultMarker(hue),
+                    onInfoWindowClick = { marker ->
+                        Log.d("MarkerClick", "Clicked Marker: ${marker.title}")
+                        Log.d("MarkerClick", "Clicked Marker ${post}")
+                        onDetailClick(post.id, post.title)
+                        false
+                    },
                     draggable = true
                 )
             }
