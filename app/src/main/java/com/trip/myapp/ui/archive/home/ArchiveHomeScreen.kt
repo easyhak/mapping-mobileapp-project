@@ -220,7 +220,7 @@ fun ArchiveHomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
@@ -281,7 +281,7 @@ fun ArchiveCardItem(
             }
             .aspectRatio(1f)
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

@@ -1,9 +1,11 @@
 package com.trip.myapp.ui.map.home
 
+
 import android.graphics.Color
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,13 +16,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -56,6 +61,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -65,14 +71,16 @@ import com.trip.myapp.ui.HomeBottomNavItem
 import com.trip.myapp.ui.HomeBottomNavigation
 import com.trip.myapp.ui.NavigationItem
 import com.trip.myapp.ui.theme.AppTheme
+import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MapHomeScreen(
     onCommunityClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onWriteClick: () -> Unit,
-    onDetailClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     onLogoutClick: () -> Unit,
 
     viewModel: MapHomeViewModel = hiltViewModel()
@@ -173,7 +181,6 @@ private fun MapHomeScreen(
                         contentDescription = "Logo Image",
                         modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp)
                     )
-                    //Text("Mapping")
                 },
                 actions = {
                     IconButton(
@@ -209,7 +216,7 @@ private fun MapHomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onWriteClick,
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
@@ -218,6 +225,7 @@ private fun MapHomeScreen(
         ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             TabRow(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 selectedTabIndex = selectedTabIndex
             ) {
                 tabs.forEachIndexed { index, title ->
@@ -233,7 +241,11 @@ private fun MapHomeScreen(
                 0 -> MapContent(
                     posts = posts
                 )
-                1 -> CalendarContent()
+
+                1 -> CalendarContent(
+                    // todo 월 별로 가져오기
+                    posts = posts
+                )
             }
         }
 
@@ -257,7 +269,7 @@ private fun ProfileDropdownMenuWrapper(
 }
 
 @Composable
-fun ProfileDropdownMenu(
+private fun ProfileDropdownMenu(
     showMenu: Boolean,
     onDismissRequest: () -> Unit,
     onInfoClick: () -> Unit,
@@ -281,7 +293,8 @@ fun ProfileDropdownMenu(
 
 @Composable
 private fun MapContent(
-    posts: List<Post>
+    posts: List<Post>,
+    modifier: Modifier = Modifier
 ) {
     // 대한민국의 중심 좌표 (위도, 경도)
     val koreaCenter = LatLng(37.5665, 126.9780)  // 서울, 대한민국
@@ -292,13 +305,18 @@ private fun MapContent(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,  // 확대/축소 버튼 비 활성화
+                compassEnabled = false,       // 나침반 비 활성화
+                mapToolbarEnabled = false    // 지도 툴바 비 활성화
+            )
         ) {
             posts.forEach {
                 val intColor = it.pinColor.toInt()
@@ -315,14 +333,16 @@ private fun MapContent(
             }
 
         }
+
     }
 }
 
 @Composable
-fun CalendarContent() {
+private fun CalendarContent(posts: List<Post>) {
 
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
-    val today = java.time.LocalDate.now() // 오늘 날짜
+    var selectedPosts by remember { mutableStateOf<List<Post>>(emptyList()) }
+    val today = java.time.LocalDate.now()
 
     val firstDayOfMonth = currentMonth.atDay(1)
     val lastDayOfMonth = currentMonth.atEndOfMonth()
@@ -344,7 +364,7 @@ fun CalendarContent() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // 저번 달
+            // 이전 달
             IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBackIosNew,
@@ -373,7 +393,7 @@ fun CalendarContent() {
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(vertical = 20.dp),
+            contentPadding = PaddingValues(vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             items(weekDays.size) { index ->
@@ -399,12 +419,22 @@ fun CalendarContent() {
 
             // 날짜 표시
             items(totalDays) { day ->
-                val date = currentMonth.atDay(day + 1) // 현재 날짜 계산
-                val isToday = date == today // 오늘 날짜인지 확인
+                val date = currentMonth.atDay(day + 1)
+                val isToday = date == today
+
+                // 해당 날짜에 표시할 Post 찾기
+                val postsForDate = posts.filter { post ->
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val start = LocalDate.parse(post.startDate, formatter)
+                    val end = LocalDate.parse(post.endDate, formatter)
+                    date in start..end
+                }
 
                 Box(
                     modifier = Modifier
-                        .padding(4.dp)
+                        .clickable {
+                            selectedPosts = postsForDate // 선택된 날짜의 Post 업데이트
+                        }
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -418,6 +448,45 @@ fun CalendarContent() {
                         } else {
                             MaterialTheme.typography.bodyMedium
                         }
+                    )
+
+                    // 하이라이트 색상 추가
+                    if (postsForDate.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(8.dp)
+                                .background(
+                                    androidx.compose.ui.graphics.Color(postsForDate.first().pinColor),
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 선택된 날짜의 Post 정보 표시
+        Column(modifier = Modifier.fillMaxWidth()) {
+            selectedPosts.forEach { post ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { /* Row 클릭 시 행동 정의 */ }
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PushPin,
+                        contentDescription = "Pin",
+                        tint = androidx.compose.ui.graphics.Color(post.pinColor),
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Text(
+                        text = post.title,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
@@ -433,7 +502,7 @@ private fun PreviewMapScreen() {
             onCommunityClick = {},
             onArchiveClick = { },
             onWriteClick = { },
-            onDetailClick = { },
+            onDetailClick = { _, _ -> },
             onLogoutClick = { }
         )
     }

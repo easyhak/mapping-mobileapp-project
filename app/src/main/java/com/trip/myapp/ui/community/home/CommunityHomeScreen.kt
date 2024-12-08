@@ -47,6 +47,7 @@ fun CommunityHomeScreen(
     onMapClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     viewModel: CommunityHomeViewModel = hiltViewModel()
 ) {
     val posts = viewModel.pagedPosts.collectAsLazyPagingItems()
@@ -72,13 +73,14 @@ fun CommunityHomeScreen(
     CommunityHomeScreen(
         onMapClick = onMapClick,
         onArchiveClick = onArchiveClick,
-        post = posts,
         onSignOutClick = viewModel::signOut,
         onInfoClick = {
             // 내 정보 버튼 클릭 시 이메일 다이얼로그 표시
             showEmailDialog = true
         },
         loginEmail = loginEmail
+        onDetailClick = onDetailClick,
+        post = posts
     )
     if (showEmailDialog) {
         AlertDialog(
@@ -99,10 +101,11 @@ fun CommunityHomeScreen(
 private fun CommunityHomeScreen(
     onMapClick: () -> Unit,
     onArchiveClick: () -> Unit,
-    post: LazyPagingItems<Post>,
     onSignOutClick: () -> Unit,
     onInfoClick: () -> Unit,
     loginEmail: String
+    onDetailClick: (String, String) -> Unit,
+    post: LazyPagingItems<Post>
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -183,7 +186,7 @@ private fun CommunityHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
 
-        ) {
+            ) {
             items(
                 count = post.itemCount,
                 key = { index -> post[index]?.id ?: index }
@@ -192,6 +195,7 @@ private fun CommunityHomeScreen(
                 if (postItem != null) {
                     CommunityPostCard(
                         post = postItem,
+                        onDetailClick = onDetailClick
                     )
                 }
             }
@@ -244,5 +248,7 @@ private fun CommunityScreenPreview() {
         onArchiveClick = {},
         onMapClick = {},
         onLogoutClick = {}
+        onDetailClick = { _, _ -> },
+        post = flowOf(PagingData.from(listOf(Post()))).collectAsLazyPagingItems()
     )
 }

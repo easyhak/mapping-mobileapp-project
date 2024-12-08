@@ -6,6 +6,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.trip.myapp.ui.archive.ArchiveGraph
+import com.trip.myapp.ui.community.detail.CommunityDetailScreen
 import com.trip.myapp.ui.community.home.CommunityHomeScreen
 import com.trip.myapp.ui.login.LoginRoute
 import com.trip.myapp.ui.map.MapGraph
@@ -17,7 +18,7 @@ data object CommunityGraph {
     data object CommunityHomeRoute
 
     @Serializable
-    data class CommunityDetailRoute(val id: Long)
+    data class CommunityDetailRoute(val postId: String, val postName: String)
 }
 
 fun NavGraphBuilder.communityGraph(navController: NavController) {
@@ -42,11 +43,19 @@ fun NavGraphBuilder.communityGraph(navController: NavController) {
                         .setLaunchSingleTop(true)
                         .build()
                     navController.navigate(LoginRoute, navOptions = logOutOptions)
+                },
+                onDetailClick = { postId, postName ->
+                    navController.navigate(
+                        CommunityGraph.CommunityDetailRoute(
+                            postId = postId,
+                            postName = postName
+                        ),
+                    )
                 }
             )
         }
         composable<CommunityGraph.CommunityDetailRoute> {
-            CommunityDetailScreen( navController::navigateUp)
+            CommunityDetailScreen(navController::navigateUp)
         }
     }
 }

@@ -56,7 +56,7 @@ fun MapDetailScreen() {
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Blue // AppBar 배경색 설정
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer // AppBar 배경색 설정
                 ),
                 title = {
                     Column(

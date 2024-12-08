@@ -115,7 +115,7 @@ private fun PostCardItem(post: Post) {
             .clickable {}
             .aspectRatio(1f)
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -139,7 +139,7 @@ private fun PostCardItem(post: Post) {
                     .fillMaxWidth()
                     .weight(1f)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Text("No Image", style = MaterialTheme.typography.bodyMedium)

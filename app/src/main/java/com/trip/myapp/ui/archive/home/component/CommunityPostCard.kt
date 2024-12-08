@@ -1,5 +1,6 @@
 package com.trip.myapp.ui.archive.home.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
@@ -23,9 +24,14 @@ import com.trip.myapp.ui.theme.AppTheme
 @Composable
 fun CommunityPostCard(
     post: Post,
+    onDetailClick: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+            .clickable {
+                onDetailClick(post.id, post.title)
+            }) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(post.imageUrlList.first())
@@ -59,6 +65,7 @@ private fun PostCardPreview() {
                 userName = "김민수",
                 imageUrlList = listOf("https://picsum.photos/200/300")
             ),
+            onDetailClick = { _, _ -> }
         )
     }
 }
