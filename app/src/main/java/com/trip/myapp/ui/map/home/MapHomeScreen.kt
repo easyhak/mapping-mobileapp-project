@@ -252,7 +252,7 @@ private fun ProfileDropdownMenuWrapper(
 }
 
 @Composable
-fun ProfileDropdownMenu(
+private fun ProfileDropdownMenu(
     showMenu: Boolean,
     onDismissRequest: () -> Unit,
     onInfoClick: () -> Unit,
