@@ -442,7 +442,7 @@ private fun CalendarContent(
                 ) {
                     Text(
                         text = weekDays[index],
-                        style = MaterialTheme.typography.bodyMedium.copy(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.ExtraBold
                         )
                     )
@@ -478,26 +478,34 @@ private fun CalendarContent(
                     Text(
                         text = (day + 1).toString(),
                         style = if (isToday) {
-                            MaterialTheme.typography.bodyMedium.copy(
+                            MaterialTheme.typography.bodyLarge.copy(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.ExtraBold
                             )
                         } else {
-                            MaterialTheme.typography.bodyMedium
+                            MaterialTheme.typography.bodyLarge
                         }
                     )
 
-                    // 하이라이트 색상 추가
+                    // 날짜에 해당하는 Post가 여러 개 있을 경우, 각 Post마다 원을 표시
                     if (postsForDate.isNotEmpty()) {
-                        Box(
+                        Column(
                             modifier = Modifier
-                                .size(8.dp)
-                                .background(
-                                    androidx.compose.ui.graphics.Color(postsForDate.first().pinColor),
-                                    shape = CircleShape
+                                .align(Alignment.CenterEnd),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            postsForDate.forEachIndexed { index, post ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .background(
+                                            androidx.compose.ui.graphics.Color(post.pinColor),
+                                            shape = CircleShape
+                                        )
                                 )
-                                .align(Alignment.CenterEnd)
-                        )
+                            }
+                        }
                     }
                 }
             }
