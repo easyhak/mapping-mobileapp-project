@@ -234,14 +234,14 @@ fun ArchiveHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item {
-                ArchiveCardItem(
-                    archive = Archive(
-                        name = "전체"
-                    ),
-                    onDetailClick = onDetailClick,
-                )
-            }
+//            item {
+//                ArchiveCardItem(
+//                    archive = Archive(
+//                        name = "전체"
+//                    ),
+//                    onDetailClick = onDetailClick,
+//                )
+//            }
             items(
                 count = archives.itemCount,
                 key = { index -> archives[index]?.id ?: index }
@@ -286,7 +286,7 @@ fun ArchiveCardItem(
         if (archive.thumbnailImageUrl.isNotEmpty()) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(archive.thumbnailImageUrl.isNotEmpty())
+                    .data(archive.thumbnailImageUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = archive.name,

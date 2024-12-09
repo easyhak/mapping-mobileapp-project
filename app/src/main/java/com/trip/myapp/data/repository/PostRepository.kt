@@ -103,6 +103,7 @@ class PostRepository @Inject constructor(
         val archiveRef = userCollection.document(userId).collection("archives").document(archiveId)
         val postRef = postCollection.document(postId).get().await()
         val post = postRef.toObject(Post::class.java) ?: throw Exception("Post not found")
+        archiveRef.update("thumbnailImageUrl", post.imageUrlList.first()).await()
         archiveRef.collection("posts").document(postId).set(post).await()
     }
 

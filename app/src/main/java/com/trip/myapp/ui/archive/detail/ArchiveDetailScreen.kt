@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,7 +35,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.trip.myapp.R
 import com.trip.myapp.domain.model.Post
 import com.trip.myapp.ui.theme.AppTheme
 import com.trip.myapp.util.toLazyPagingItems
@@ -122,16 +120,15 @@ private fun PostCardItem(post: Post) {
         if (post.imageUrlList.isNotEmpty()) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://picsum.photos/200/300")
+                    .data(post.imageUrlList.first())
                     .crossfade(true)
                     .build(),
-                placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = post.title,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
         } else {
             Box(
