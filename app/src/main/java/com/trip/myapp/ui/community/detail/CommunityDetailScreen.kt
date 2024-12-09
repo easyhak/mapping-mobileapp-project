@@ -1,6 +1,7 @@
 package com.trip.myapp.ui.community.detail
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,13 +21,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,7 +40,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +55,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -54,6 +66,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.trip.myapp.domain.model.Archive
 import com.trip.myapp.domain.model.Post
 
 @Composable
@@ -62,11 +75,35 @@ fun CommunityDetailScreen(
     viewModel: CommunityDetailViewModel = hiltViewModel()
 ) {
     val post by viewModel.post.collectAsStateWithLifecycle()
+    val pagedArchives = viewModel.pagedArchives.collectAsLazyPagingItems()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is CommunityDetailEvent.ScrapPost.Success -> {
+                    showBottomSheet = false
+                }
+
+                is CommunityDetailEvent.ScrapPost.Failure -> {
+                    Toast.makeText(context, "업로드 실패", Toast.LENGTH_SHORT).show()
+                }
+
+                is CommunityDetailEvent.ScrapPost.Loading -> {
+                }
+            }
+        }
+    }
+
     CommunityDetailScreen(
         onBackClick = onBackClick,
         post = post,
         isLoading = isLoading,
+        archives = pagedArchives,
+        scrapPost = viewModel::scrapPost,
+        showBottomSheet = showBottomSheet,
+        onShowBottomSheetChange = { showBottomSheet = it },
         postName = viewModel.postName ?: ""
     )
 }
@@ -77,6 +114,10 @@ private fun CommunityDetailScreen(
     onBackClick: () -> Unit,
     post: Post,
     isLoading: Boolean,
+    archives: LazyPagingItems<Archive>,
+    scrapPost: (String) -> Unit,
+    showBottomSheet: Boolean,
+    onShowBottomSheetChange: (Boolean) -> Unit,
     postName: String,
 ) {
     Scaffold(
@@ -94,7 +135,9 @@ private fun CommunityDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        onShowBottomSheetChange(true)
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.MenuOpen, contentDescription = "scrap")
                     }
                 }
@@ -107,7 +150,7 @@ private fun CommunityDetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                ){
+                ) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -115,6 +158,7 @@ private fun CommunityDetailScreen(
                     )
                 }
             }
+
             else -> {
                 PostDetailContent(
                     post = post,
@@ -124,9 +168,39 @@ private fun CommunityDetailScreen(
                 )
             }
         }
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { onShowBottomSheetChange(false) },
+            ) {
+                LazyColumn() {
+                    items(
+                        count = archives.itemCount,
+                        key = { index -> archives[index]?.id ?: index }
+                    ) { index ->
+                        val archive = archives[index]
+                        if (archive != null) {
+                            ListItem(
+                                headlineContent = { Text(archive.name) },
+                                trailingContent = {
+                                    IconButton(
+                                        onClick = {
+                                            scrapPost(archive.id)
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Add,
+                                            contentDescription = "Localized description",
+                                        )
+                                    }
+                                })
+                            HorizontalDivider()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
