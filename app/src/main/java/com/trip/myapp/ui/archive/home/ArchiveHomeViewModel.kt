@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.trip.myapp.data.repository.AuthRepository
 import com.trip.myapp.domain.model.Archive
 import com.trip.myapp.domain.usecase.AddArchiveUseCase
-import com.trip.myapp.domain.usecase.FetchPagedArchivesUseCase
+import com.trip.myapp.domain.usecase.FetchPagedArchiveUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ArchiveHomeViewModel @Inject constructor(
-    private val fetchPagedArchivesUseCase: FetchPagedArchivesUseCase,
+    private val fetchPagedArchiveUseCase: FetchPagedArchiveUseCase,
     private val addArchiveUseCase: AddArchiveUseCase,
     private val authRepository: AuthRepository,
     private val firebaseAuth: FirebaseAuth
@@ -29,10 +29,9 @@ class ArchiveHomeViewModel @Inject constructor(
     private val _event = Channel<ArchiveHomeEvent>(64)
     val event = _event.receiveAsFlow()
 
-    val pagedArchives: Flow<PagingData<Archive>> = authRepository.getUserUID()?.let { uid ->
-        fetchPagedArchivesUseCase(uid)
+    val pagedArchives: Flow<PagingData<Archive>> =
+        fetchPagedArchiveUseCase()
         .cachedIn(viewModelScope)
-    } ?: flowOf(PagingData.empty())
 
     fun addArchive(name: String) {
         viewModelScope.launch {

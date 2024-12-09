@@ -9,7 +9,7 @@ class FetchArchiveUseCase @Inject constructor(
     private val archiveRepository: ArchiveRepository,
     private val authRepository: AuthRepository
 ) {
-    suspend fun operator(archiveId: String): Archive {
+    suspend operator fun invoke(archiveId: String): Archive {
         val userId =
             authRepository.getUserUID() ?: throw IllegalStateException("User is not signed in")
         return archiveRepository.fetchArchive(userId, archiveId)
