@@ -143,7 +143,6 @@ private fun CommunityHomeScreen(
                         contentDescription = "Logo Image",
                         modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp)
                     )
-                    //Text("Mapping")
                 },
                 actions = {
                     IconButton(
@@ -151,26 +150,22 @@ private fun CommunityHomeScreen(
                         modifier = Modifier
                             .padding(top = 20.dp, end = 16.dp)
                             .align(Alignment.CenterVertically)
-                    ) { // 버튼 클릭 시 메뉴 표시
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.Person, // 프로필 아이콘 리소스
+                            imageVector = Icons.Default.Person,
                             contentDescription = "Profile Icon"
                         )
                     }
-
-                    // 간단히 호출
                     ProfileDropdownMenuWrapper(
                         showMenu = showMenu,
                         onDismissRequest = { showMenu = false },
                         onInfoClick = {
                             showMenu = false
-                            println("내 정보 눌림")
-                            onInfoClick()// TODO: 내정보 처리 추가
+                            onInfoClick()
                         },
                         onLogoutClick = {
                             showMenu = false
                             onSignOutClick()
-
                         }
                     )
                 }

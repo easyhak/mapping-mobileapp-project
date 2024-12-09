@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -44,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -305,13 +307,18 @@ fun ArchiveCardItem(
                     .background(Color(archive.color)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No Image", style = MaterialTheme.typography.bodyMedium)
+                Icon(
+                    imageVector = Icons.Default.ImageNotSupported,
+                    contentDescription = "사진",
+                    tint = Color.White
+                )
             }
         }
         Text(
             text = archive.name,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 8.dp)
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+
+            modifier = Modifier.padding(top = 4.dp)
         )
     }
 }

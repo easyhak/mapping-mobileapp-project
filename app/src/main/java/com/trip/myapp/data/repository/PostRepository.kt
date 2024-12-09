@@ -132,7 +132,7 @@ class PostRepository @Inject constructor(
             snapshot.toObjects(Post::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
-            emptyList() // 에러 발생 시 빈 리스트 반환
+            emptyList()
         }
     }
 }

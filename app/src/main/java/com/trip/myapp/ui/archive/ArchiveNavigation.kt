@@ -60,7 +60,15 @@ fun NavGraphBuilder.archiveGraph(navController: NavController) {
         }
         composable<ArchiveGraph.ArchiveDetailRoute> {
             ArchiveDetailScreen(
-                onBackClick = navController::navigateUp
+                onBackClick = navController::navigateUp,
+                onDetailClick = { postId, postTitle ->
+                    navController.navigate(
+                        route = CommunityGraph.CommunityDetailRoute(
+                            postId = postId,
+                            postName = postTitle
+                        )
+                    )
+                }
             )
         }
     }

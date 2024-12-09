@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,6 +43,7 @@ import com.trip.myapp.util.toLazyPagingItems
 @Composable
 fun ArchiveDetailScreen(
     onBackClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     viewModel: ArchiveDetailViewModel = hiltViewModel()
 ) {
     val pagedPosts = viewModel.pagedPosts.collectAsLazyPagingItems()
@@ -51,9 +53,9 @@ fun ArchiveDetailScreen(
         archiveId = viewModel.archiveId,
         archiveName = viewModel.archiveName,
         onBackClick = onBackClick,
+        onDetailClick = onDetailClick,
         posts = pagedPosts,
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +64,7 @@ private fun ArchiveDetailScreen(
     archiveId: String?,
     archiveName: String?,
     onBackClick: () -> Unit,
+    onDetailClick: (String, String) -> Unit,
     posts: LazyPagingItems<Post>
 ) {
     Scaffold(
@@ -96,8 +99,9 @@ private fun ArchiveDetailScreen(
             ) { index ->
                 val postItem = posts[index]
                 if (postItem != null) {
-                    PostCardItem(
+                    ArchiveDetailPostCard(
                         post = postItem,
+                        onDetailClick = onDetailClick
                     )
                 }
             }
@@ -105,46 +109,41 @@ private fun ArchiveDetailScreen(
     }
 }
 
+
 @Composable
-private fun PostCardItem(post: Post) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable {}
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (post.imageUrlList.isNotEmpty()) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(post.imageUrlList.first())
-                    .crossfade(true)
-                    .build(),
-                contentDescription = post.title,
+private fun ArchiveDetailPostCard(
+    post: Post,
+    onDetailClick: (String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clickable {
+                onDetailClick(post.id, post.title)
+            }) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(post.imageUrlList.first())
+                .crossfade(true)
+                .build(),
+            contentDescription = "image",
+            modifier = Modifier
+                .aspectRatio(1f),
+            contentScale = ContentScale.Crop,
+        )
+        if (post.imageUrlList.size > 1) {
+            Icon(
+                imageVector = Icons.Default.PhotoLibrary,
+                contentDescription = "Multiple Photos Icon",
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.Crop,
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+
             )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No Image", style = MaterialTheme.typography.bodyMedium)
-            }
         }
     }
 }
-
 
 @Preview
 @Composable
@@ -168,28 +167,8 @@ private fun PreviewArchiveDetailScreen() {
             archiveId = "",
             archiveName = "테스트",
             onBackClick = {},
-            posts = dummyPosts
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewArchiveDetailCard() {
-    AppTheme {
-        PostCardItem(
-            post = Post(
-                id = "1",
-                title = "Title",
-                content = "Content",
-                imageUrlList = listOf("https://picsum.photos/200/300"),
-                startDate = "",
-                endDate = "",
-                pinColor = 0,
-                latitude = 0.0,
-                longitude = 0.0,
-                userId = "1"
-            )
+            posts = dummyPosts,
+            onDetailClick = { _, _ -> }
         )
     }
 }
