@@ -107,6 +107,16 @@ class PostRepository @Inject constructor(
         archiveRef.collection("posts").document(postId).set(post).await()
     }
 
+    // scrap 삭제하기
+    suspend fun unScrapPost(
+        userId: String,
+        archiveId: String,
+        postId: String
+    ) {
+        val archiveRef = userCollection.document(userId).collection("archives").document(archiveId)
+        archiveRef.collection("posts").document(postId).delete().await()
+    }
+
     // user - archive 내에 있는 scrap 된 post 를 가져오기
     fun fetchPagedScrapedPosts(
         userId: String,
