@@ -29,10 +29,9 @@ class ArchiveHomeViewModel @Inject constructor(
     private val _event = Channel<ArchiveHomeEvent>(64)
     val event = _event.receiveAsFlow()
 
-    val pagedArchives: Flow<PagingData<Archive>> = authRepository.getUserUID()?.let { uid ->
-        fetchPagedArchiveUseCase(uid)
+    val pagedArchives: Flow<PagingData<Archive>> =
+        fetchPagedArchiveUseCase()
         .cachedIn(viewModelScope)
-    } ?: flowOf(PagingData.empty())
 
     fun addArchive(name: String) {
         viewModelScope.launch {
