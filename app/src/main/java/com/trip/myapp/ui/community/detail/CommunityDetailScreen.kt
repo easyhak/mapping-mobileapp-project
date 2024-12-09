@@ -84,10 +84,12 @@ fun CommunityDetailScreen(
             when (event) {
                 is CommunityDetailEvent.ScrapPost.Success -> {
                     showBottomSheet = false
+                    Toast.makeText(context, "스크랩 성공", Toast.LENGTH_SHORT).show()
+                    
                 }
 
                 is CommunityDetailEvent.ScrapPost.Failure -> {
-                    Toast.makeText(context, "업로드 실패", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "스크랩 실패", Toast.LENGTH_SHORT).show()
                 }
 
                 is CommunityDetailEvent.ScrapPost.Loading -> {

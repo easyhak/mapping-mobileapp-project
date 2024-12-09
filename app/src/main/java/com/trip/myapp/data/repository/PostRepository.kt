@@ -103,6 +103,7 @@ class PostRepository @Inject constructor(
         val archiveRef = userCollection.document(userId).collection("archives").document(archiveId)
         val postRef = postCollection.document(postId).get().await()
         val post = postRef.toObject(Post::class.java) ?: throw Exception("Post not found")
+        archiveRef.update("thumbnailImageUrl", post.imageUrlList.first()).await()
         archiveRef.collection("posts").document(postId).set(post).await()
     }
 
@@ -131,7 +132,7 @@ class PostRepository @Inject constructor(
             snapshot.toObjects(Post::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
-            emptyList() // 에러 발생 시 빈 리스트 반환
+            emptyList()
         }
     }
 }
