@@ -182,8 +182,8 @@ private fun MapWriteScreen(
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer, // 앱바의 배경색
-                    titleContentColor = MaterialTheme.colorScheme.primary, // 제목 텍스트 색상
-                    navigationIconContentColor = MaterialTheme.colorScheme.primary  // 네비게이션 아이콘(뒤로가기) 색상
+                    titleContentColor = Color.Black, // 제목 텍스트 색상
+                    navigationIconContentColor = Color.Black  // 네비게이션 아이콘(뒤로가기) 색상
                 )
             )
         },
