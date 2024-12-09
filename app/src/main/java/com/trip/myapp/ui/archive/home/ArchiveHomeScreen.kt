@@ -86,16 +86,6 @@ fun ArchiveHomeScreen(
                     Toast.makeText(context, "로그아웃 실패", Toast.LENGTH_SHORT).show()
                 }
 
-                else -> {
-
-                }
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.event.collect { event ->
-            when (event) {
                 is ArchiveHomeEvent.AddArchive.Success -> {
                     pagedArchives.refresh()
                 }
@@ -103,13 +93,10 @@ fun ArchiveHomeScreen(
                 is ArchiveHomeEvent.AddArchive.Failure -> {
                     Toast.makeText(context, "생성 실패", Toast.LENGTH_SHORT).show()
                 }
-
-                else -> {
-
-                }
             }
         }
     }
+
     ArchiveHomeScreen(
         onCommunityClick = onCommunityClick,
         onMapClick = onMapClick,

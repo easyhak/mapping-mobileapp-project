@@ -1,5 +1,9 @@
 package com.trip.myapp.ui.community
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -25,7 +29,8 @@ fun NavGraphBuilder.communityGraph(navController: NavController) {
     navigation<CommunityGraph>(
         startDestination = CommunityGraph.CommunityHomeRoute,
     ) {
-        composable<CommunityGraph.CommunityHomeRoute> {
+        composable<CommunityGraph.CommunityHomeRoute>(
+        ) {
             val options = NavOptions.Builder()
                 .setPopUpTo(CommunityGraph, inclusive = false, saveState = true)
                 .setLaunchSingleTop(true)
@@ -54,7 +59,20 @@ fun NavGraphBuilder.communityGraph(navController: NavController) {
                 }
             )
         }
-        composable<CommunityGraph.CommunityDetailRoute> {
+        composable<CommunityGraph.CommunityDetailRoute>(
+            enterTransition = {
+                slideInHorizontally (initialOffsetX = { 1000 }) + fadeIn()
+            },
+            exitTransition = {
+                slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
+            },
+            popEnterTransition = {
+                slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+            },
+            popExitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
+            }
+        ) {
             CommunityDetailScreen(navController::navigateUp)
         }
     }
