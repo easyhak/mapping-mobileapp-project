@@ -639,7 +639,6 @@ private fun PickingLocation(
                         longitude
                     )
                 ),
-                /* Todo 아이콘 모양 변경하기 */
                 icon = BitmapDescriptorFactory.defaultMarker(hue),
                 title = "선택한 위치"
             )

@@ -38,10 +38,10 @@ class MapWriteViewModel @Inject constructor(
     private val _pinColor = MutableStateFlow(Color.Red)
     val pinColor = _pinColor.asStateFlow()
 
-    private val _latitude = MutableStateFlow(37.5665)
+    private val _latitude = MutableStateFlow(37.50375925598199)
     val latitude = _latitude.asStateFlow()
 
-    private val _longitude = MutableStateFlow(126.9780)
+    private val _longitude = MutableStateFlow(126.95628584359363)
     val longitude = _longitude.asStateFlow()
 
     private val _address = MutableStateFlow("")
