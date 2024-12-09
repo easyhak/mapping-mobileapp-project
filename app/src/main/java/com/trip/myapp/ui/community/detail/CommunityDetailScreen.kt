@@ -1,11 +1,13 @@
 package com.trip.myapp.ui.community.detail
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,13 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CardDefaults
@@ -35,7 +37,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
@@ -52,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -68,6 +70,9 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.trip.myapp.domain.model.Archive
 import com.trip.myapp.domain.model.Post
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun CommunityDetailScreen(
@@ -85,7 +90,7 @@ fun CommunityDetailScreen(
                 is CommunityDetailEvent.ScrapPost.Success -> {
                     showBottomSheet = false
                     Toast.makeText(context, "스크랩 성공", Toast.LENGTH_SHORT).show()
-                    
+
                 }
 
                 is CommunityDetailEvent.ScrapPost.Failure -> {
@@ -150,8 +155,8 @@ private fun CommunityDetailScreen(
             isLoading -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
                         .padding(innerPadding)
+                        .fillMaxSize()
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -165,8 +170,8 @@ private fun CommunityDetailScreen(
                 PostDetailContent(
                     post = post,
                     modifier = Modifier
-                        .fillMaxSize()
                         .padding(innerPadding)
+                        .fillMaxSize()
                 )
             }
         }
@@ -204,68 +209,67 @@ private fun CommunityDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PostDetailContent(
     post: Post,
     modifier: Modifier = Modifier
 ) {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer // AppBar 배경색 설정
-                ),
-                title = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            post.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        )
-
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* 뒤로가기 동작 */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* 편집하기 동작 */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Comment,
-                            contentDescription = "Edit",
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-        },
-    )
-    { innerPadding ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(innerPadding)
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Slider(images = post.imageUrlList)
-            Spacer(modifier = Modifier.height(6.dp))
-            ContentSection(post)
-        }
-
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState()),
+    ) {
+        // 사용자 정보 섹션
+        UserSection(post)
+        Spacer(modifier = Modifier.height(8.dp))
+        Slider(images = post.imageUrlList)
+        Spacer(modifier = Modifier.height(6.dp))
+        ContentSection(post)
     }
+}
+
+@Composable
+private fun UserSection(post: Post, modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                model = post.userProfileImageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(MaterialTheme.shapes.extraLarge)
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)),
+                contentScale = ContentScale.Crop,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = post.userName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = formatDateToString(post.createdAt.toDate()),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    ),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+    }
+}
+
+
+private fun formatDateToString(date: Date): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return dateFormat.format(date)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -296,9 +300,11 @@ private fun Slider(modifier: Modifier = Modifier, images: List<String>) {
 
 @Composable
 private fun ContentSection(post: Post) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
         // 날짜 섹션
         SectionCard(label = "날짜") {
             Text(
@@ -349,9 +355,11 @@ private fun SectionCard(label: String, content: @Composable () -> Unit) {
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.titleSmall,
