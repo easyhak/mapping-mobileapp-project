@@ -236,14 +236,6 @@ fun ArchiveHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-//            item {
-//                ArchiveCardItem(
-//                    archive = Archive(
-//                        name = "전체"
-//                    ),
-//                    onDetailClick = onDetailClick,
-//                )
-//            }
             items(
                 count = archives.itemCount,
                 key = { index -> archives[index]?.id ?: index }

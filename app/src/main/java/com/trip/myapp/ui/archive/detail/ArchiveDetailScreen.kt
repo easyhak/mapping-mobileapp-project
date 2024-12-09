@@ -1,19 +1,19 @@
 package com.trip.myapp.ui.archive.detail
 
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,9 +23,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,13 +52,28 @@ fun ArchiveDetailScreen(
     viewModel: ArchiveDetailViewModel = hiltViewModel()
 ) {
     val pagedPosts = viewModel.pagedPosts.collectAsLazyPagingItems()
-    // 여러개의 post 가 있음
+
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is ArchiveDetailEvent.UnscrapPost.Success -> {
+                    pagedPosts.refresh()
+                }
+
+                is ArchiveDetailEvent.UnscrapPost.Failure -> {
+                    Toast.makeText(context, "실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     ArchiveDetailScreen(
         archiveId = viewModel.archiveId,
         archiveName = viewModel.archiveName,
         onBackClick = onBackClick,
         onDetailClick = onDetailClick,
+        onUnscrapPost = viewModel::unscrapPost,
         posts = pagedPosts,
     )
 }
@@ -65,6 +85,7 @@ private fun ArchiveDetailScreen(
     archiveName: String?,
     onBackClick: () -> Unit,
     onDetailClick: (String, String) -> Unit,
+    onUnscrapPost: (String) -> Unit,
     posts: LazyPagingItems<Post>
 ) {
     Scaffold(
@@ -101,7 +122,8 @@ private fun ArchiveDetailScreen(
                 if (postItem != null) {
                     ArchiveDetailPostCard(
                         post = postItem,
-                        onDetailClick = onDetailClick
+                        onDetailClick = onDetailClick,
+                        onUnscrapPost = onUnscrapPost,
                     )
                 }
             }
@@ -114,13 +136,26 @@ private fun ArchiveDetailScreen(
 private fun ArchiveDetailPostCard(
     post: Post,
     onDetailClick: (String, String) -> Unit,
+    onUnscrapPost: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isLongPressed by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
-            .clickable {
-                onDetailClick(post.id, post.title)
-            }) {
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        isLongPressed = true
+                    },
+                    onTap = {
+                        if (!isLongPressed) {
+                            onDetailClick(post.id, post.title)
+                        }
+                    }
+                )
+            }
+    ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(post.imageUrlList.first())
@@ -139,8 +174,27 @@ private fun ArchiveDetailPostCard(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
-
             )
+        }
+
+        // Long click 상태에서 삭제 아이콘 표시
+        if (isLongPressed) {
+            IconButton(
+                onClick = {
+                    onUnscrapPost(post.id) // 삭제 클릭 처리
+                    isLongPressed = false // 상태 초기화
+                },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .background(MaterialTheme.colorScheme.surface, shape = CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Icon",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -168,6 +222,7 @@ private fun PreviewArchiveDetailScreen() {
             archiveName = "테스트",
             onBackClick = {},
             posts = dummyPosts,
+            onUnscrapPost = {},
             onDetailClick = { _, _ -> }
         )
     }
