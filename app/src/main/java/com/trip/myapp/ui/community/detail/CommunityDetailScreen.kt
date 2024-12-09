@@ -1,10 +1,10 @@
 package com.trip.myapp.ui.community.detail
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,21 +12,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -81,6 +82,9 @@ private fun CommunityDetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                ),
                 title = {
                     Text(postName)
                 },
@@ -132,7 +136,6 @@ fun PostDetailContent(
     modifier: Modifier = Modifier
 ) {
 
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -176,21 +179,22 @@ fun PostDetailContent(
     )
     { innerPadding ->
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
         ) {
-            Slider(modifier = Modifier.padding(innerPadding), post.imageUrlList)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Slider(images = post.imageUrlList)
+            Spacer(modifier = Modifier.height(6.dp))
             ContentSection(post)
         }
 
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Slider(modifier: Modifier = Modifier, images: List<String>) {
-
 
     HorizontalUncontainedCarousel(
         state = rememberCarouselState { images.count() },
@@ -216,64 +220,73 @@ private fun Slider(modifier: Modifier = Modifier, images: List<String>) {
 
 @Composable
 private fun ContentSection(post: Post) {
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.padding(start = 8.dp, top = 8.dp)) {
-            Icon(
-                imageVector = Icons.Default.CalendarMonth,
-                contentDescription = "Calendar",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp)) {
+        // 날짜 섹션
+        SectionCard(label = "날짜") {
             Text(
                 text = "${post.startDate} ~ ${post.endDate}",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+        Spacer(modifier = Modifier.height(2.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Comment,
-                contentDescription = "Content",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+        // 내용 섹션
+        SectionCard(label = "내용") {
             Text(
                 text = post.content,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start
             )
         }
+        Spacer(modifier = Modifier.height(2.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 아이콘과 주소
-        Row(modifier = Modifier.padding(start = 8.dp, top = 8.dp)) {
-            Icon(
-                imageVector = Icons.Filled.PushPin,
-                contentDescription = "PushPin",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+        // 위치 섹션
+        SectionCard(label = "위치") {
             Text(
                 text = post.address,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+        Spacer(modifier = Modifier.height(2.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 구글 맵
+        // 구글 맵 섹션
         GoogleMapView(
             latitude = post.latitude,
             longitude = post.longitude,
-            pinColor = post.pinColor
+            pinColor = post.pinColor,
         )
     }
 }
+
+@Composable
+private fun SectionCard(label: String, content: @Composable () -> Unit) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            content()
+        }
+    }
+}
+
 
 @Composable
 fun GoogleMapView(
@@ -288,25 +301,31 @@ fun GoogleMapView(
         )
     }
 
-    GoogleMap(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .height(350.dp)
-            .padding(horizontal = 8.dp),
-        cameraPositionState = cameraPositionState
+            .padding(horizontal = 4.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
     ) {
-        val intColor = pinColor.toInt()
-        val hsv = FloatArray(3)
-        android.graphics.Color.colorToHSV(intColor, hsv)
-        val hue = hsv[0]
-        Marker(
-            state = MarkerState(
-                position = LatLng(
-                    latitude,
-                    longitude
-                )
-            ),
-            icon = BitmapDescriptorFactory.defaultMarker(hue),
-        )
+        GoogleMap(
+            modifier = Modifier
+                .fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            val intColor = pinColor.toInt()
+            val hsv = FloatArray(3)
+            android.graphics.Color.colorToHSV(intColor, hsv)
+            val hue = hsv[0]
+            Marker(
+                state = MarkerState(
+                    position = LatLng(
+                        latitude,
+                        longitude
+                    )
+                ),
+                icon = BitmapDescriptorFactory.defaultMarker(hue),
+            )
+        }
     }
 }
