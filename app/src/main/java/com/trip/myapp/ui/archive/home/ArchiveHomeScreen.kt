@@ -184,7 +184,6 @@ fun ArchiveHomeScreen(
                         contentDescription = "Logo Image",
                         modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp)
                     )
-                    //Text("Mapping")
                 },
                 actions = {
                     IconButton(
@@ -205,8 +204,7 @@ fun ArchiveHomeScreen(
                         onDismissRequest = { showMenu = false },
                         onInfoClick = {
                             showMenu = false
-                            println("내 정보 눌림")
-                            onInfoClick()// TODO: 내정보 처리 추가
+                            onInfoClick()
                         },
                         onLogoutClick = {
                             showMenu = false

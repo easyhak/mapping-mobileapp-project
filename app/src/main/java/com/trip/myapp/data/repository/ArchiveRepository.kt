@@ -56,7 +56,7 @@ class ArchiveRepository @Inject constructor(
         userId: String,
     ): Flow<PagingData<Archive>> {
         return Pager(
-            config = PagingConfig(pageSize = 10),
+            config = PagingConfig(pageSize = 30),
             pagingSourceFactory = {
                 ArchivePagingSource(
                     archiveCollection = userCollection.document(userId).collection("archives")

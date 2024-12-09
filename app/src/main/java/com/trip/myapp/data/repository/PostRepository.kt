@@ -98,9 +98,12 @@ class PostRepository @Inject constructor(
     suspend fun scrapPost(
         userId: String,
         archiveId: String,
-        postId: String,
+        postId: String
     ) {
-        // todo
+        val archiveRef = userCollection.document(userId).collection("archives").document(archiveId)
+        val postRef = postCollection.document(postId).get().await()
+        val post = postRef.toObject(Post::class.java) ?: throw Exception("Post not found")
+        archiveRef.collection("posts").document(postId).set(post).await()
     }
 
     // user - archive 내에 있는 scrap 된 post 를 가져오기
